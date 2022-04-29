@@ -51,7 +51,7 @@ public class FilmController {
         log.info("Film added successful");
     }
 
-    private boolean validate(Film film){
+    private boolean validate(Film film) {
         if (film == null) return false;
         return !film.getName().isEmpty()
                 && film.getDescription().length() < MAX_DESC_LENGTH

@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping
-    public void addUser(@Valid @RequestBody User user) {
+    public void addUser(@RequestBody User user) {
         if (users.contains(user)) {
             log.warn("Unable to add. User is already exist.");
             throw new ValidationException("Unable to add. User is already exist.");
@@ -40,7 +39,7 @@ public class UserController {
     }
 
     @PutMapping
-    public void updateUser(@Valid @RequestBody User user) {
+    public void updateUser(@RequestBody User user) {
         if (!validate(user)) {
             log.warn("Invalid user properties {}", user);
             throw new ValidationException("Invalid user properties");
@@ -51,13 +50,13 @@ public class UserController {
 
     private boolean validate(User user) {
         if (user == null) return false;
-        if (user.getName() == null || user.getName().isEmpty()){
+        if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
         return !user.getEmail().isEmpty()
                 && user.getEmail().contains("@")
                 && !user.getLogin().isEmpty()
                 && !user.getLogin().contains(" ")
-                && LocalDate.parse(user.getBirthday(),formatter).isBefore(LocalDate.now());
+                && LocalDate.parse(user.getBirthday(), formatter).isBefore(LocalDate.now());
     }
 }
