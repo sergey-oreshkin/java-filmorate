@@ -10,6 +10,6 @@ public class User {
     @Email
     private String email;
     private String login;
-    private String nicName;
-    private String birthDate;
+    private String name;
+    private String birthday;
 }

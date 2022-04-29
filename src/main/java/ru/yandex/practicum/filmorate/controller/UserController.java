@@ -50,13 +50,14 @@ public class UserController {
     }
 
     private boolean validate(User user) {
-        if (user.getNicName().isEmpty()){
-            user.setNicName(user.getLogin());
+        if (user == null) return false;
+        if (user.getName() == null || user.getName().isEmpty()){
+            user.setName(user.getLogin());
         }
         return !user.getEmail().isEmpty()
                 && user.getEmail().contains("@")
                 && !user.getLogin().isEmpty()
                 && !user.getLogin().contains(" ")
-                && LocalDate.parse(user.getBirthDate(),formatter).isBefore(LocalDate.now());
+                && LocalDate.parse(user.getBirthday(),formatter).isBefore(LocalDate.now());
     }
 }

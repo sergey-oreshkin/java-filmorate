@@ -52,9 +52,10 @@ public class FilmController {
     }
 
     private boolean validate(Film film){
-        return !film.getTitle().isEmpty()
+        if (film == null) return false;
+        return !film.getName().isEmpty()
                 && film.getDescription().length() < MAX_DESC_LENGTH
-                && LocalDate.parse(film.getDate(), formatter).isAfter(EARLIEST_DATE)
+                && LocalDate.parse(film.getReleaseDate(), formatter).isAfter(EARLIEST_DATE)
                 && film.getDuration() > 0;
     }
 }
