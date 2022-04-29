@@ -48,4 +48,4 @@ jobs:
 
       - name: Run POSTMAN tests
         run: |
-          newman run https://github.com/yandex-praktikum/java-filmorate/blob/controllers-films-users/postman/sprint.json -r cli
+          newman run ./tests/postman/sprint.json -r cli
