@@ -17,7 +17,6 @@ import java.util.Set;
 @Slf4j
 public class UserController {
     private final Set<User> users = new HashSet<>();
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @GetMapping
     public List<User> users() {
@@ -57,6 +56,6 @@ public class UserController {
                 && user.getEmail().contains("@")
                 && !user.getLogin().isEmpty()
                 && !user.getLogin().contains(" ")
-                && LocalDate.parse(user.getBirthday(), formatter).isBefore(LocalDate.now());
+                && user.getBirthday().isBefore(LocalDate.now());
     }
 }

@@ -19,7 +19,6 @@ import java.util.Set;
 public class FilmController {
     private static final int MAX_DESC_LENGTH = 200;
     private static final LocalDate EARLIEST_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final Set<Film> films = new HashSet<>();
 
     @GetMapping
@@ -55,7 +54,7 @@ public class FilmController {
         if (film == null) return false;
         return !film.getName().isEmpty()
                 && film.getDescription().length() < MAX_DESC_LENGTH
-                && LocalDate.parse(film.getReleaseDate(), formatter).isAfter(EARLIEST_DATE)
+                && film.getReleaseDate().isAfter(EARLIEST_DATE)
                 && film.getDuration() > 0;
     }
 }
