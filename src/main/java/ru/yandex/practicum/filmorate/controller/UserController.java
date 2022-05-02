@@ -1,61 +1,61 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final Set<User> users = new HashSet<>();
+    private final Map<Integer, User> users = new HashMap<>();
 
     @GetMapping
-    public List<User> users() {
-        return new ArrayList<>(users);
+    public Collection<User> users() {
+        return users.values();
     }
 
     @PostMapping
-    public void addUser(@RequestBody User user) {
-        if (users.contains(user)) {
-            log.warn("Unable to add. User is already exist.");
-            throw new ValidationException("Unable to add. User is already exist.");
+    public User add(@Valid @NotNull @RequestBody User user) {
+        if (users.containsKey(user.getId())) {
+            throw new ValidationException("User already exist.");
         }
-        if (!validate(user)) {
-            log.warn("Invalid user properties {}", user);
-            throw new ValidationException("Invalid user properties");
-        }
-        users.add(user);
-        log.info("User added successful");
+        return addUser(user);
     }
 
     @PutMapping
-    public void updateUser(@RequestBody User user) {
-        if (!validate(user)) {
-            log.warn("Invalid user properties {}", user);
-            throw new ValidationException("Invalid user properties");
-        }
-        users.add(user);
-        log.info("User updated successful");
+    public User addOrUpdate(@Valid @NotNull @RequestBody User user) {
+        return addUser(user);
     }
 
     private boolean validate(User user) {
-        if (user == null) return false;
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
-        return !user.getEmail().isEmpty()
-                && user.getEmail().contains("@")
-                && !user.getLogin().isEmpty()
-                && !user.getLogin().contains(" ")
-                && user.getBirthday().isBefore(LocalDate.now());
+        return !user.getLogin().contains(" ");
+    }
+
+    private User addUser(User user) {
+        if (validate(user)) {
+            users.put(user.getId(), user);
+            log.info("User added successful");
+            return user;
+        }
+        throw new ValidationException("Spaces in login is unacceptable");
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<String> handleValidationException(ValidationException ex) {
+        log.warn("Validation failed. " + ex.getMessage());
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

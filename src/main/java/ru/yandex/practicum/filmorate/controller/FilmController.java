@@ -1,60 +1,65 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.Month;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private static final int MAX_DESC_LENGTH = 200;
-    private static final LocalDate EARLIEST_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
-    private final Set<Film> films = new HashSet<>();
+    private final Map<Integer, Film> films = new HashMap<>();
+
+    private final LocalDate EARLIEST_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
 
     @GetMapping
-    public List<Film> getFilms() {
-        return new ArrayList<>(films);
+    public Collection<Film> getFilms() {
+        return films.values();
     }
 
     @PostMapping
-    public void addFilm(@RequestBody Film film) {
-        if (films.contains(film)) {
-            log.warn("Unable to add. Film is already exist.");
-            throw new ValidationException("Unable to add. Film is already exist.");
+    public Film add(@Valid @NotNull @RequestBody Film film) {
+        if (films.containsKey(film.getId())) {
+            throw new ValidationException("Film already exist.");
         }
-        if (!validate(film)) {
-            log.warn("Invalid film properties {}", film);
-            throw new ValidationException("Invalid film properties");
-        }
-        films.add(film);
-        log.info("Film added successful");
+        return addFilm(film);
     }
 
     @PutMapping
-    public void updateFilm(@RequestBody Film film) {
-        if (!validate(film)) {
-            log.warn("Invalid film properties {}", film);
-            throw new ValidationException("Invalid film properties");
-        }
-        films.add(film);
-        log.info("Film added successful");
+    public Film addOrUpdate(@Valid @NotNull @RequestBody Film film) {
+        return addFilm(film);
     }
 
     private boolean validate(Film film) {
-        if (film == null) return false;
-        return !film.getName().isEmpty()
-                && film.getDescription().length() < MAX_DESC_LENGTH
-                && film.getReleaseDate().isAfter(EARLIEST_DATE)
-                && film.getDuration() > 0;
+        if (film.getReleaseDate().isAfter(EARLIEST_DATE)) {
+            return true;
+        }
+        return false;
+    }
+
+    private Film addFilm(Film film) {
+        if (validate(film)) {
+            films.put(film.getId(), film);
+            log.info("Film added successful");
+            return film;
+        }
+        throw new ValidationException("Release date can't be before " + EARLIEST_DATE);
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<String> handleValidationException(ValidationException ex) {
+        log.warn("Validation failed. " + ex.getMessage());
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }
