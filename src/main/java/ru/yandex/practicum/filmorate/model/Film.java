@@ -11,13 +11,18 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 public class Film {
+
     private int id;
+
     @NotBlank
     private String name;
+
     @NotBlank
     @Size(max = 200)
     private String description;
+
     private LocalDate releaseDate;
+
     @Positive
     private int duration;
 }

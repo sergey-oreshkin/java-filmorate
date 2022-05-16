@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -33,10 +34,13 @@ public class FilmControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    FilmService filmService;
+
     @BeforeAll
     static void init() {
         validFilm = new Film(
-                1,
+                0,
                 "film name",
                 "film desc",
                 LocalDate.of(1900, Month.JANUARY, 5),
@@ -46,7 +50,7 @@ public class FilmControllerTest {
 
     @Test
     void test2_createValidFilmResponseShouldBeOk() throws Exception {
-        validFilm.setId(validFilm.getId() + 1);
+        validFilm.setId(0);
         String body = mapper.writeValueAsString(validFilm);
         this.mockMvc.perform(post("/films").content(body).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -54,6 +58,10 @@ public class FilmControllerTest {
 
     @Test
     void test4_updateValidFilmResponseShouldBeOk() throws Exception {
+        if (filmService.getAll().isEmpty()) {
+            filmService.create(validFilm);
+        }
+        validFilm.setId(1);
         String body = mapper.writeValueAsString(validFilm);
         this.mockMvc.perform(put("/films").content(body).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -61,7 +69,7 @@ public class FilmControllerTest {
 
     @MethodSource("invalidFilmsSource")
     @ParameterizedTest(name = "{0}")
-    void test6_createInvalidUserResponseShouldBeBadRequest(String name, Film film) throws Exception {
+    void test6_createInvalidFilmResponseShouldBeBadRequest(String name, Film film) throws Exception {
         String body = mapper.writeValueAsString(film);
         this.mockMvc.perform(post("/films").content(body).contentType(MediaType.APPLICATION_JSON))
                 .andExpectAll(status().isBadRequest());

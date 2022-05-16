@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -34,10 +35,13 @@ public class UserControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    UserService userService;
+
     @BeforeAll
     static void init() {
         validUser = new User(
-                1,
+                0,
                 "email@mail.ru",
                 "login",
                 "name",
@@ -47,7 +51,7 @@ public class UserControllerTest {
 
     @Test
     void test1_createValidUserResponseShouldBeOk() throws Exception {
-        validUser.setId(validUser.getId() + 1);
+        validUser.setId(0);
         String body = mapper.writeValueAsString(validUser);
         this.mockMvc.perform(post("/users").content(body).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -55,6 +59,10 @@ public class UserControllerTest {
 
     @Test
     void test3_updateValidUserResponseShouldBeOk() throws Exception {
+        if (userService.getAll().isEmpty()) {
+            userService.create(validUser);
+        }
+        validUser.setId(1);
         String body = mapper.writeValueAsString(validUser);
         this.mockMvc.perform(put("/users").content(body).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
