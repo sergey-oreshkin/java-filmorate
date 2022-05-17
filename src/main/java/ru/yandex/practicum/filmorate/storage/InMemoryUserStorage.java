@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -12,9 +12,9 @@ import java.util.Map;
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
-    private final Map<Integer, User> users = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
 
-    private int nextId = 0;
+    private long nextId = 0;
 
     @Override
     public List<User> getAll() {
@@ -23,20 +23,36 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        int id = getNextId();
+        long id = getNextId();
         user.setId(id);
-        return users.put(id, user);
+        users.put(id, user);
+        return user;
     }
 
     @Override
     public User update(User user) {
         if (users.containsKey(user.getId())) {
-            return users.put(user.getId(), user);
+            users.put(user.getId(), user);
+            return user;
         }
-        throw new ValidationException("Update failed. User with id=" + user.getId() + " does not exist.");
+        throw new NotFoundException("Update failed. User with id=" + user.getId() + " does not exist.");
     }
 
-    private int getNextId() {
+    @Override
+    public User getById(long id) {
+        if (users.containsKey(id)) {
+            return users.get(id);
+        }
+        throw new NotFoundException("User with id=" + id + " not found");
+    }
+
+    @Override
+    public void clear() {
+        users.clear();
+        nextId = 0;
+    }
+
+    private long getNextId() {
         return ++nextId;
     }
 }

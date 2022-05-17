@@ -58,6 +58,26 @@ public class FilmController {
         );
     }
 
+    @GetMapping("{id}")
+    public Film getById(@PathVariable long id) {
+        return filmStorage.getById(id);
+    }
+
+    @PutMapping("{id}/like/{userId}")
+    public Film setLike(@PathVariable long id, @PathVariable long userId) {
+        return filmService.setLike(id, userId);
+    }
+
+    @DeleteMapping("{id}/like/{userId}")
+    public Film deleteLike(@PathVariable long id, @PathVariable long userId) {
+        return filmService.deleteLike(id, userId);
+    }
+
+    @GetMapping("popular")
+    public List<Film> getPopular(@RequestParam(defaultValue = "10") int count) {
+        return filmService.getPopular(count);
+    }
+
     private boolean isDateValid(Film film) {
         return film.getReleaseDate().isAfter(EARLIEST_DATE);
     }

@@ -11,4 +11,10 @@ public interface FilmStorage {
     Film create(Film f);
 
     Film update(Film f);
+
+    Film getById(long id);
+
+    List<Film> getTop(int count);
+
+    void clear();
 }
