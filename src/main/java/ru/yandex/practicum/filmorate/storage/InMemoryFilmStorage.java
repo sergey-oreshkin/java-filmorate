@@ -12,7 +12,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Long, Film> films = new HashMap<>();
 
-    int nextId = 0;
+    private long nextId = 0;
 
     @Override
     public List<Film> getAll() {
