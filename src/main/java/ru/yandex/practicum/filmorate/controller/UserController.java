@@ -18,9 +18,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    UserService userService;
+    private final UserService userService;
 
-    UserStorage userStorage;
+    private final UserStorage userStorage;
 
     @GetMapping
     public List<User> users() {
