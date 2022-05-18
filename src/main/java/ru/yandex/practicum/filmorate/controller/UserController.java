@@ -1,61 +1,73 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
+@RequiredArgsConstructor
 public class UserController {
-    private final Map<Integer, User> users = new HashMap<>();
+
+    private final UserService userService;
+
+    private final UserStorage userStorage;
 
     @GetMapping
-    public Collection<User> users() {
-        return users.values();
+    public List<User> users() {
+        return userStorage.getAll();
     }
 
     @PostMapping
-    public User add(@Valid @NotNull @RequestBody User user) {
-        if (users.containsKey(user.getId())) {
-            throw new ValidationException("User already exist.");
+    public User create(@Valid @NotNull @RequestBody User user) {
+        if (user.getId() != 0) {
+            throw new ValidationException("User id should be 0 for new user");
         }
-        return addUser(user);
-    }
-
-    @PutMapping
-    public User addOrUpdate(@Valid @NotNull @RequestBody User user) {
-        return addUser(user);
-    }
-
-    private boolean validate(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
-        return !user.getLogin().contains(" ");
+        return userStorage.create(user);
     }
 
-    private User addUser(User user) {
-        if (validate(user)) {
-            users.put(user.getId(), user);
-            log.info("User added successful");
-            return user;
+    @PutMapping
+    public User update(@Valid @NotNull @RequestBody User user) {
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
         }
-        throw new ValidationException("Spaces in login is unacceptable");
+        return userStorage.update(user);
     }
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<String> handleValidationException(ValidationException ex) {
-        log.warn("Validation failed. " + ex.getMessage());
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    @GetMapping("{id}")
+    public User getById(@PathVariable long id) {
+        return userStorage.getById(id);
+    }
+
+    @PutMapping("{id}/friends/{friendId}")
+    public User addFriend(@PathVariable long id, @PathVariable long friendId) {
+        return userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("{id}/friends/{friendId}")
+    public User deleteFriend(@PathVariable long id, @PathVariable long friendId) {
+        return userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("{id}/friends")
+    public List<User> getFriends(@PathVariable long id) {
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
+        return userService.getCommonFriends(id, otherId);
     }
 }
