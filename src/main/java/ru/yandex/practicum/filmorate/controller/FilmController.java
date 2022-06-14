@@ -1,12 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -17,19 +15,16 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/films")
-@Slf4j
 @RequiredArgsConstructor
 public class FilmController {
 
-    private final LocalDate EARLIEST_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
+    private final static LocalDate EARLIEST_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
 
     private final FilmService filmService;
 
-    private final FilmStorage filmStorage;
-
     @GetMapping
     public List<Film> films() {
-        return filmStorage.getAll();
+        return filmService.getAll();
     }
 
     @PostMapping
@@ -38,7 +33,7 @@ public class FilmController {
             throw new ValidationException("Film id should be 0 for new film");
         }
         if (isDateValid(film)) {
-            return filmStorage.create(film);
+            return filmService.create(film);
         }
         throw new ValidationException(
                 "The date cannot be earlier than " +
@@ -49,7 +44,7 @@ public class FilmController {
     @PutMapping
     public Film update(@Valid @NotNull @RequestBody Film film) {
         if (isDateValid(film)) {
-            return filmStorage.update(film);
+            return filmService.update(film);
         }
         throw new ValidationException(
                 "The date cannot be earlier than " +
@@ -59,7 +54,7 @@ public class FilmController {
 
     @GetMapping("{id}")
     public Film getById(@PathVariable long id) {
-        return filmStorage.getById(id);
+        return filmService.getById(id);
     }
 
     @PutMapping("{id}/like/{userId}")
