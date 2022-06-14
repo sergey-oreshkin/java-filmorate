@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.storage.filmstorage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -47,21 +46,15 @@ public class FilmService {
     }
 
     public Film getById(long id) {
-        Optional<Film> film = filmStorage.findById(id);
-        if (film.isPresent()) {
-            return film.get();
-        }
-        throw new NotFoundException("Film with id=" + id + " not found");
+        return filmStorage.findById(id)
+                .orElseThrow(() -> new NotFoundException("Film with id=" + id + " not found"));
     }
 
     private Film validateAndGetFilm(long filmId, long userId) {
-        Optional<Film> f = filmStorage.findById(filmId);
-        if (f.isEmpty()) {
-            throw new NotFoundException("Film with id=" + filmId + " not found");
-        }
-        if (userStorage.findById(userId).isEmpty()) {
-            throw new NotFoundException("User with id=" + userId + " not found");
-        }
-        return f.get();
+        userStorage.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
+
+        return filmStorage.findById(filmId)
+                .orElseThrow(() -> new NotFoundException("Film with id=" + filmId + " not found"));
     }
 }
