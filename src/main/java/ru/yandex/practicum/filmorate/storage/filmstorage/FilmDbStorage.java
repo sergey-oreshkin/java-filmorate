@@ -33,31 +33,31 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film create(Film f) {
-        if (findById(f.getId()).isPresent()) {
-            throw new ValidationException("Film with id=" + f.getId() + "already exist");
+    public Film create(Film film) {
+        if (findById(film.getId()).isPresent()) {
+            throw new ValidationException("Film with id=" + film.getId() + "already exist");
         }
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName("film").usingGeneratedKeyColumns("id");
 
         SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("name", f.getName())
-                .addValue("description", f.getDescription())
-                .addValue("rating_id", f.getMpa().getId())
-                .addValue("release_date", f.getReleaseDate())
-                .addValue("duration", f.getDuration());
+                .addValue("name", film.getName())
+                .addValue("description", film.getDescription())
+                .addValue("rating_id", film.getMpa().getId())
+                .addValue("release_date", film.getReleaseDate())
+                .addValue("duration", film.getDuration());
 
         Number num = jdbcInsert.executeAndReturnKey(parameters);
 
-        f.setId(num.longValue());
-        updateGenres(f);
-        return f;
+        film.setId(num.longValue());
+        updateGenres(film);
+        return film;
     }
 
     @Override
-    public Film update(Film f) {
-        if (findById(f.getId()).isEmpty()) {
-            throw new NotFoundException("Film with id=" + f.getId() + " not found");
+    public Film update(Film film) {
+        if (findById(film.getId()).isEmpty()) {
+            throw new NotFoundException("Film with id=" + film.getId() + " not found");
         }
         String sql = "update film set " +
                 "name=?," +
@@ -67,16 +67,16 @@ public class FilmDbStorage implements FilmStorage {
                 "duration=? " +
                 "where id=?";
         jdbcTemplate.update(sql,
-                f.getName(),
-                f.getDescription(),
-                f.getMpa().getId(),
-                f.getReleaseDate(),
-                f.getDuration(),
-                f.getId()
+                film.getName(),
+                film.getDescription(),
+                film.getMpa().getId(),
+                film.getReleaseDate(),
+                film.getDuration(),
+                film.getId()
         );
-        updateGenres(f);
-        updateLikes(f);
-        return f;
+        updateGenres(film);
+        updateLikes(film);
+        return film;
     }
 
     @Override
