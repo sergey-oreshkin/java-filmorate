@@ -2,10 +2,10 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,38 +17,49 @@ public class UserService {
     private final UserStorage userStorage;
 
     public User addFriend(long userId, long friendId) {
-        User user = userStorage.getById(userId);
-        User friend = userStorage.getById(friendId);
-        user.addFriend(friendId);
-        friend.addFriend(userId);
-        userStorage.update(user);
-        userStorage.update(friend);
-        return user;
+        User user = getById(userId);
+        getById(friendId); //validate friendId
+        user.getFriends().add(friendId);
+        return userStorage.update(user);
     }
 
     public User deleteFriend(long userId, long friendId) {
-        User user = userStorage.getById(userId);
-        User friend = userStorage.getById(friendId);
-        user.deleteFriend(friendId);
-        friend.deleteFriend(userId);
-        userStorage.update(user);
-        userStorage.update(friend);
-        return user;
+        User user = getById(userId);
+        getById(friendId); //validate friendId
+        user.getFriends().remove(friendId);
+        return userStorage.update(user);
     }
 
     public List<User> getFriends(long id) {
-        return userStorage.getById(id).getFriends().stream()
-                .map(userStorage::getById)
+        return getById(id).getFriends().stream()
+                .flatMap(fId -> userStorage.findById(fId).stream())
                 .collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(long userId, long otherId) {
-        User user = userStorage.getById(userId);
-        User other = userStorage.getById(otherId);
-        Set<Long> friends = new HashSet<>(user.getFriends());
+        User user = getById(userId);
+        User other = getById(otherId);
+        Set<Long> friends = user.getFriends();
         friends.retainAll(other.getFriends());
-        return friends.stream().
-                map(userStorage::getById)
+        return friends.stream()
+                .flatMap(fId -> userStorage.findById(fId).stream())
                 .collect(Collectors.toList());
+    }
+
+    public List<User> getAll() {
+        return userStorage.getAll();
+    }
+
+    public User create(User user) {
+        return userStorage.create(user);
+    }
+
+    public User update(User user) {
+        return userStorage.update(user);
+    }
+
+    public User getById(long id) {
+        return userStorage.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
     }
 }

@@ -1,12 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -14,17 +12,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-@Slf4j
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    private final UserStorage userStorage;
-
     @GetMapping
     public List<User> users() {
-        return userStorage.getAll();
+        return userService.getAll();
     }
 
     @PostMapping
@@ -35,7 +30,7 @@ public class UserController {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
-        return userStorage.create(user);
+        return userService.create(user);
     }
 
     @PutMapping
@@ -43,12 +38,12 @@ public class UserController {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
-        return userStorage.update(user);
+        return userService.update(user);
     }
 
     @GetMapping("{id}")
     public User getById(@PathVariable long id) {
-        return userStorage.getById(id);
+        return userService.getById(id);
     }
 
     @PutMapping("{id}/friends/{friendId}")

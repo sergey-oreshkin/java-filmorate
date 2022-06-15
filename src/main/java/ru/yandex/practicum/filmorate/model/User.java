@@ -4,10 +4,7 @@ import lombok.Setter;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,25 +18,23 @@ public class User {
 
     @Email
     @NotBlank
+    @Size(max = 50)
     String email;
 
     @NotBlank
     @Pattern(regexp = "\\S*$")
+    @Size(max = 50)
     String login;
 
     @NonFinal
     @Setter
+    @Size(max = 50)
     String name;
 
-    @Past LocalDate birthday;
+    @Past
+    LocalDate birthday;
 
-    private final Set<Long> friends = new HashSet<>();
-
-    public void addFriend(long id) {
-        friends.add(id);
-    }
-
-    public void deleteFriend(long id) {
-        friends.remove(id);
-    }
+    @NonFinal
+    @Setter
+    Set<Long> friends;
 }

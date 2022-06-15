@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.filmstorage;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Component("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Long, Film> films = new HashMap<>();
@@ -37,11 +37,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getById(long id) {
+    public Optional<Film> findById(long id) {
         if (films.containsKey(id)) {
-            return films.get(id);
+            return Optional.of(films.get(id));
         }
-        throw new NotFoundException("Film with id=" + id + " not found");
+        return Optional.empty();
     }
 
     @Override

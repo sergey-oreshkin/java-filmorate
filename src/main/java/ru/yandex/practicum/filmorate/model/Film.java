@@ -5,6 +5,7 @@ import lombok.Value;
 import lombok.experimental.NonFinal;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
@@ -19,26 +20,28 @@ public class Film {
     long id;
 
     @NotBlank
+    @Size(max = 50)
     String name;
 
     @NotBlank
     @Size(max = 200)
     String description;
 
+    @NotNull
+    Mpa mpa;
+
     LocalDate releaseDate;
 
     @Positive
     int duration;
 
-    private final Set<Long> likes = new HashSet<>();
+    @NonFinal
+    @Setter
+    Set<Long> likes;
 
-    public void setLike(long id) {
-        likes.add(id);
-    }
-
-    public void deleteLike(long id) {
-        likes.remove(id);
-    }
+    @NonFinal
+    @Setter
+    Set<Genre> genres;
 
     public int rate() {
         return likes.size();
