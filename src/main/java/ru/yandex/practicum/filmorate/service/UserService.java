@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,9 +32,7 @@ public class UserService {
 
     public List<User> getFriends(long id) {
         return getById(id).getFriends().stream()
-                .map(userStorage::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(fId -> userStorage.findById(fId).stream())
                 .collect(Collectors.toList());
     }
 
@@ -44,10 +41,8 @@ public class UserService {
         User other = getById(otherId);
         Set<Long> friends = user.getFriends();
         friends.retainAll(other.getFriends());
-        return friends.stream().
-                map(userStorage::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        return friends.stream()
+                .flatMap(fId -> userStorage.findById(fId).stream())
                 .collect(Collectors.toList());
     }
 
@@ -67,5 +62,4 @@ public class UserService {
         return userStorage.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
     }
-
 }

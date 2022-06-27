@@ -33,29 +33,29 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User create(User u) {
-        if (findById(u.getId()).isPresent()) {
-            throw new ValidationException("User with id=" + u.getId() + "already exist");
+    public User create(User user) {
+        if (findById(user.getId()).isPresent()) {
+            throw new ValidationException("User with id=" + user.getId() + "already exist");
         }
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
         jdbcInsert.withTableName("users").usingGeneratedKeyColumns("id");
 
         SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("email", u.getEmail())
-                .addValue("login", u.getLogin())
-                .addValue("name", u.getName())
-                .addValue("birthday", u.getBirthday());
+                .addValue("email", user.getEmail())
+                .addValue("login", user.getLogin())
+                .addValue("name", user.getName())
+                .addValue("birthday", user.getBirthday());
 
         Number num = jdbcInsert.executeAndReturnKey(parameters);
 
-        u.setId(num.longValue());
-        return u;
+        user.setId(num.longValue());
+        return user;
     }
 
     @Override
-    public User update(User u) {
-        if (findById(u.getId()).isEmpty()) {
-            throw new NotFoundException("User with id=" + u.getId() + " not exist");
+    public User update(User user) {
+        if (findById(user.getId()).isEmpty()) {
+            throw new NotFoundException("User with id=" + user.getId() + " not exist");
         }
         String sql = "update users set " +
                 "email=?," +
@@ -64,13 +64,13 @@ public class UserDbStorage implements UserStorage {
                 "birthday=? " +
                 "where id=?";
         jdbcTemplate.update(sql,
-                u.getEmail(),
-                u.getLogin(),
-                u.getName(),
-                u.getBirthday(),
-                u.getId());
-        updateFriends(u);
-        return u;
+                user.getEmail(),
+                user.getLogin(),
+                user.getName(),
+                user.getBirthday(),
+                user.getId());
+        updateFriends(user);
+        return user;
     }
 
     @Override
@@ -89,14 +89,14 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sql);
     }
 
-    private void updateFriends(User u) {
+    private void updateFriends(User user) {
         String deleteSql = "delete from friendship where user_id=?";
         String insertSql = "insert into friendship (user_id, friend_id) " +
                 "values (?,?)";
 
-        jdbcTemplate.update(deleteSql, u.getId());
-        if (u.getFriends() != null) {
-            u.getFriends().forEach(id -> jdbcTemplate.update(insertSql, u.getId(), id));
+        jdbcTemplate.update(deleteSql, user.getId());
+        if (user.getFriends() != null) {
+            user.getFriends().forEach(id -> jdbcTemplate.update(insertSql, user.getId(), id));
         }
     }
 
@@ -121,6 +121,5 @@ public class UserDbStorage implements UserStorage {
         return new HashSet<>(
                 jdbcTemplate.query(sql, (rs, num) -> rs.getLong("friend_id"), id)
         );
-
     }
 }
