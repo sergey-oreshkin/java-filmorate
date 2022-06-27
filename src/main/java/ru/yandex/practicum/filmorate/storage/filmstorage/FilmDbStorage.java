@@ -142,7 +142,7 @@ public class FilmDbStorage implements FilmStorage {
 
     private Film mapRowToFilm(ResultSet rs, int rowNum) throws SQLException {
         if (rs.getRow() == 0) {
-            throw new NotFoundException("film not found");
+            throw new NotFoundException("Film not found");
         }
         Film film = new Film(
                 rs.getLong("id"),
