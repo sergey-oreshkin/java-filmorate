@@ -14,10 +14,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @Primary
@@ -87,6 +84,27 @@ public class UserDbStorage implements UserStorage {
     public void clear() {
         String sql = "delete from users";
         jdbcTemplate.update(sql);
+    }
+
+    @Override
+    public Map<Long, Map<Long, Integer>> getLikesMatrix() {
+        String sqlUsers = "select id from users";
+        String sqlFilms = "select id from film";
+        String sqlLikes = "select * from likes where user_id=?";
+        Map<Long, Map<Long, Integer>> matrix = new HashMap<>();
+        Map<Long, Integer> filmLikesTemplate = new HashMap<>();
+
+        List<Long> allFilmsId = jdbcTemplate.query(sqlFilms, (rs, i) -> rs.getLong("id"));
+        List<Long> allUsersId = jdbcTemplate.query(sqlUsers, (rs, i) -> rs.getLong("id"));
+        allFilmsId.forEach(id -> filmLikesTemplate.put(id, 0));
+
+        allUsersId.forEach(userId -> {
+            Map<Long, Integer> filmLikes = new HashMap<>(filmLikesTemplate);
+            List<Long> likes = jdbcTemplate.query(sqlLikes, (rs, i) -> rs.getLong("film_id"), userId);
+            likes.forEach(filmId -> filmLikes.put(filmId, 1));
+            matrix.put(userId, filmLikes);
+        });
+        return matrix;
     }
 
     private void updateFriends(User user) {
