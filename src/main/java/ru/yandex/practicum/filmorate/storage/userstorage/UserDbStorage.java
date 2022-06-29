@@ -86,6 +86,11 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sql);
     }
 
+    /**
+     * @author sergey-oreshkin
+     * @return Map<Long, Map<Long, Integer>> ключи первой мапы id юзеров,
+     * второй ключи - id фильмов, значения : 1 - есть лайк, 0 - нет лайка
+     */
     @Override
     public Map<Long, Map<Long, Integer>> getLikesMatrix() {
         String sqlUsers = "select id from users";

@@ -65,6 +65,11 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
     }
 
+    /**
+     * @author sergey-oreshkin
+     * @param id - идентификатор юзера для которого готовятся рекомендации
+     * @return - List<Film> - список рекомендованных фильмов основанный на коллаборативной фильтрации
+     */
     public List<Film> getRecommendation(long id) {
         getById(id); //validate user
         Map<Long, Map<Long, Integer>> matrix = userStorage.getLikesMatrix();
