@@ -53,6 +53,17 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Удаление фильма из мапы
+     * Метод не реализован ввиду ненадобности
+     */
+    @Override
+    public boolean delete(Film film) {
+        return false;
+    }
+
     @Override
     public void clear() {
         nextId = 0;

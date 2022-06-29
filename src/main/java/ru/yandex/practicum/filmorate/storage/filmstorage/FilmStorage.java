@@ -17,5 +17,7 @@ public interface FilmStorage {
 
     List<Film> getTop(int count);
 
+    boolean delete(Film film);
+
     void clear();
 }

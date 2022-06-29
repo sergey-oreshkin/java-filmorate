@@ -52,6 +52,18 @@ public class FilmController {
         );
     }
 
+    /**
+     * @param id фильма, который удалют
+     * @return boolean
+     * @author Grigory-PC
+     * <p>
+     * Удаляет фильм из таблицы
+     */
+    @DeleteMapping("/{id}")
+    public boolean delete(@Valid @PathVariable long id) {
+        return filmService.delete(id);
+    }
+
     @GetMapping("{id}")
     public Film getById(@PathVariable long id) {
         return filmService.getById(id);

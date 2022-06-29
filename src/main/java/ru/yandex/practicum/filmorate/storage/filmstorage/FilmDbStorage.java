@@ -111,6 +111,18 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sql, this::mapRowToFilm, idList.toArray());
     }
 
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Удаление фильма из таблицы film
+     */
+    @Override
+    public boolean delete(Film film) {
+        String sql = "DELETE FROM film WHERE id = ?";
+
+        return jdbcTemplate.update(sql, film.getId()) > 0;
+    }
+
     @Override
     public void clear() {
         String sql = "delete from film";

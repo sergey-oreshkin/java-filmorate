@@ -41,6 +41,20 @@ public class UserController {
         return userService.update(user);
     }
 
+    /**
+     * @param id объекта пользователя, которого удалют
+     * @return boolean
+     * @author Grigory-PC
+     * <p>
+     * Удаляет пользователя из таблицы
+     */
+    @DeleteMapping("/{id}")
+    public boolean deleteFriend(@Valid @PathVariable long id) {
+
+        return userService.delete(id);
+    }
+
+
     @GetMapping("{id}")
     public User getById(@PathVariable long id) {
         return userService.getById(id);
