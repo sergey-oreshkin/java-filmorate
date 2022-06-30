@@ -17,6 +17,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+    /**
+     * @author aitski (Leonid Kvan)
+     * Класс для связи с базой данных по функции "Отзывы"
+     */
+
 @Component
 @Primary
 @RequiredArgsConstructor
@@ -78,14 +83,6 @@ public class ReviewDbStorage implements ReviewStorage {
         }
     }
 
-    /**
-     * @author aitski (Leonid Kvan)
-     * метод возвращает список рецензий по выбранному фильму
-     * (если не указан filmId=0, то все рецензии)
-     * и лимитирует по количеству (count),
-     * сортировка по убыванию кол-ва лайков за рецензию
-     * (useful)
-     */
     @Override
     public List<Review> getReviewsByIdLimited(long filmId, int count) {
 
@@ -100,11 +97,6 @@ public class ReviewDbStorage implements ReviewStorage {
         return jdbcTemplate.query(sql1, this::mapRowToReview, filmId, count);
     }
 
-    /**
-     * @author aitski (Leonid Kvan)
-     * метод обновляет кол-во лайков за рецензию (useful)
-     * в таблице review по айдишнику рецензии
-     */
     @Override
     public void updateLike(int useful, long reviewId) {
         validateId(reviewId);
