@@ -10,6 +10,17 @@ import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
 
 import java.util.List;
 
+    /**
+     * @author aitski (Leonid Kvan)
+     * Класс для реализации бизнес-логики по функции "Отзывы"
+     * создает, обновляет, удаляет, находит по айди,
+     * выдает список всех отзывов с указанным лимитом (10 по умолчанию)
+     * и по указанному фильму (по умолчанию - все фильмы),
+     * с сортировкой по кол-ву лайков
+     * добавляет/удаляет лайки/дислайки с (де)инкрементацией
+     * поля useful
+     */
+
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -20,13 +31,13 @@ public class ReviewService {
 
     public Review create(Review review) {
         validateFilmId(review.getFilmId());
-        validateFilmId(review.getUserId());
+        validateUserId(review.getUserId());
         return reviewStorage.create(review);
     }
 
     public Review update(Review review) {
         validateFilmId(review.getFilmId());
-        validateFilmId(review.getUserId());
+        validateUserId(review.getUserId());
         return reviewStorage.update(review);
     }
 
