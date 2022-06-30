@@ -54,14 +54,13 @@ public class FilmController {
 
     /**
      * @param id фильма, который удалют
-     * @return boolean
      * @author Grigory-PC
      * <p>
      * Удаляет фильм из таблицы
      */
     @DeleteMapping("/{id}")
-    public boolean delete(@Valid @PathVariable long id) {
-        return filmService.delete(id);
+    public void deleteFilm(@Valid @PathVariable long id) {
+        filmService.delete(id);
     }
 
     @GetMapping("{id}")

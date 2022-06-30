@@ -71,5 +71,4 @@ public class UserService {
     public boolean delete(long id) {
         return userStorage.delete(getById(id));
     }
-
 }
