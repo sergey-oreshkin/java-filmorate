@@ -10,6 +10,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+    /**
+     * @author aitski (Leonid Kvan)
+     * Класс-контроллер, принимающий http-запросы
+     * и выдающий ответы по функции "Отзывы"
+     */
+
 @RestController
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
