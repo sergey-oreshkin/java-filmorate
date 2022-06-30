@@ -17,5 +17,7 @@ public interface FilmStorage {
 
     List<Film> getTop(int count);
 
+    List<Film> getCommonFilms(long userId, long friendId);
+
     void clear();
 }

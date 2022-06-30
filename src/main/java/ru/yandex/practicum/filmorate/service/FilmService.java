@@ -33,6 +33,12 @@ public class FilmService {
         return filmStorage.getTop(count);
     }
 
+    public List<Film> getCommonFilms (long userId, long friendId){
+        validateUserId(userId);
+        validateUserId(friendId);
+        return filmStorage.getCommonFilms(userId,friendId);
+    }
+
     public List<Film> getAll() {
         return filmStorage.getAll();
     }
@@ -57,4 +63,10 @@ public class FilmService {
         return filmStorage.findById(filmId)
                 .orElseThrow(() -> new NotFoundException("Film with id=" + filmId + " not found"));
     }
+
+    private void validateUserId(long userId) {
+        userStorage.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
+    }
+
 }

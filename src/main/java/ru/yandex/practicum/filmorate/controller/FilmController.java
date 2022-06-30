@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -70,6 +71,14 @@ public class FilmController {
     @GetMapping("popular")
     public List<Film> getPopular(@RequestParam(defaultValue = "10") int count) {
         return filmService.getPopular(count);
+    }
+
+    @GetMapping("common")
+    public List<Film> getCommonFilms(
+            @RequestParam() long userId,
+            @RequestParam() long friendId
+            ) {
+        return filmService.getCommonFilms(userId,friendId);
     }
 
     private boolean isDateValid(Film film) {
