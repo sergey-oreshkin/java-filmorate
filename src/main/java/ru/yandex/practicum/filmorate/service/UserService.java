@@ -20,14 +20,14 @@ public class UserService {
 
     public User addFriend(long userId, long friendId) {
         User user = getById(userId);
-        getById(friendId); //validate friendId
+        validateUserId(friendId);
         user.getFriends().add(friendId);
         return userStorage.update(user);
     }
 
     public User deleteFriend(long userId, long friendId) {
         User user = getById(userId);
-        getById(friendId); //validate friendId
+        validateUserId(friendId);
         user.getFriends().remove(friendId);
         return userStorage.update(user);
     }
@@ -66,44 +66,48 @@ public class UserService {
     }
 
     /**
-     * @author sergey-oreshkin
      * @param id - идентификатор юзера для которого готовятся рекомендации
      * @return - List<Film> - список рекомендованных фильмов основанный на коллаборативной фильтрации
+     * @author sergey-oreshkin
      */
     public List<Film> getRecommendation(long id) {
-        getById(id); //validate user
+        validateUserId(id);
         Map<Long, Map<Long, Integer>> matrix = userStorage.getLikesMatrix();
         Map<Long, Map<Long, Integer>> diffMatrix = new HashMap<>();
         Map<Long, Integer> freqMatrix = new HashMap<>();
-        Map<Long, Integer> currentLikes = matrix.get(id);
+        Map<Long, Integer> currentLikes = matrix.remove(id);
         Set<Long> recommendations = new HashSet<>();
 
-        for (Map.Entry<Long, Map<Long, Integer>> matrixEntry : matrix.entrySet()) {
-            if (matrixEntry.getKey() == id) continue;
-            diffMatrix.put(matrixEntry.getKey(), new HashMap<>());
-            freqMatrix.put(matrixEntry.getKey(), 0);
-            for (Map.Entry<Long, Integer> likesEntry : matrixEntry.getValue().entrySet()) {
-                int diff = likesEntry.getValue() * currentLikes.get(likesEntry.getKey());
-                diffMatrix.get(matrixEntry.getKey()).put(likesEntry.getKey(), diff);
+        matrix.forEach((userId, likes) -> {
+            diffMatrix.put(userId, new HashMap<>());
+            freqMatrix.put(userId, 0);
+            likes.forEach((filmId, like) -> {
+                int diff = like * currentLikes.get(filmId);
+                diffMatrix.get(userId).put(filmId, diff);
                 if (diff > 0) {
-                    int oldFreq = freqMatrix.get(matrixEntry.getKey());
-                    freqMatrix.put(matrixEntry.getKey(), oldFreq + 1);
+                    int oldFreq = freqMatrix.get(userId);
+                    freqMatrix.put(userId, oldFreq + 1);
                 }
-            }
-        }
-        freqMatrix.values().removeIf(v->v== 0);
-        diffMatrix.keySet().removeIf(k->!freqMatrix.containsKey(k));
+            });
+        });
 
-        diffMatrix.forEach((key, value) -> value.forEach((k,v)->{
-            if (v == 0 && matrix.get(key).get(k) == 1){
-                recommendations.add(k);
+        freqMatrix.values().removeIf(v -> v == 0);
+        diffMatrix.keySet().removeIf(k -> !freqMatrix.containsKey(k));
+
+        diffMatrix.forEach((userId, likes) -> likes.forEach((filmId, diffLike) -> {
+            if (diffLike == 0 && matrix.get(userId).get(filmId) == 1) {
+                recommendations.add(filmId);
             }
         }));
-
         return recommendations.stream()
                 .map(filmStorage::findById)
                 .flatMap(Optional::stream)
                 .collect(Collectors.toList()
                 );
+    }
+
+    private void validateUserId(long id) {
+        userStorage.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
     }
 }

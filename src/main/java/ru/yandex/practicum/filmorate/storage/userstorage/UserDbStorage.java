@@ -7,11 +7,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.sql.RowSet;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -87,28 +89,28 @@ public class UserDbStorage implements UserStorage {
     }
 
     /**
-     * @author sergey-oreshkin
-     * @return Map<Long, Map<Long, Integer>> ключи первой мапы id юзеров,
+     * @return Map<Long, Map < Long, Integer>> ключи первой мапы id юзеров,
      * второй ключи - id фильмов, значения : 1 - есть лайк, 0 - нет лайка
+     * @author sergey-oreshkin
      */
     @Override
     public Map<Long, Map<Long, Integer>> getLikesMatrix() {
-        String sqlUsers = "select id from users";
-        String sqlFilms = "select id from film";
-        String sqlLikes = "select * from likes where user_id=?";
+        String sqlFilms = "select distinct film_id from likes";
+        String sqlLikes = "select * from likes";
         Map<Long, Map<Long, Integer>> matrix = new HashMap<>();
         Map<Long, Integer> filmLikesTemplate = new HashMap<>();
 
-        List<Long> allFilmsId = jdbcTemplate.query(sqlFilms, (rs, i) -> rs.getLong("id"));
-        List<Long> allUsersId = jdbcTemplate.query(sqlUsers, (rs, i) -> rs.getLong("id"));
+        List<Long> allFilmsId = jdbcTemplate.query(sqlFilms, (rs, i) -> rs.getLong("film_id"));
         allFilmsId.forEach(id -> filmLikesTemplate.put(id, 0));
 
-        allUsersId.forEach(userId -> {
-            Map<Long, Integer> filmLikes = new HashMap<>(filmLikesTemplate);
-            List<Long> likes = jdbcTemplate.query(sqlLikes, (rs, i) -> rs.getLong("film_id"), userId);
-            likes.forEach(filmId -> filmLikes.put(filmId, 1));
-            matrix.put(userId, filmLikes);
-        });
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlLikes);
+        while (rs.next()) {
+            long userId = rs.getLong("user_id");
+            if (!matrix.containsKey(userId)) {
+                matrix.put(userId, new HashMap<>(filmLikesTemplate));
+            }
+            matrix.get(userId).put(rs.getLong("film_id"), 1);
+        }
         return matrix;
     }
 
