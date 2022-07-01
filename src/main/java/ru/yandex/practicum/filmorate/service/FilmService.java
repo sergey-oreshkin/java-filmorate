@@ -50,6 +50,15 @@ public class FilmService {
                 .orElseThrow(() -> new NotFoundException("Film with id=" + id + " not found"));
     }
 
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Поиск 'by' по режиссеру или названию фильма в таблице на основании введенных символов в 'query'
+     */
+    public List<Film> searchFilm(String query, String by) {
+        return filmStorage.search(query, by);
+    }
+
     private Film validateAndGetFilm(long filmId, long userId) {
         userStorage.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));

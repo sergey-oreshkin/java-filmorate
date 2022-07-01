@@ -111,6 +111,35 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sql, this::mapRowToFilm, idList.toArray());
     }
 
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Поиск 'by' по режиссеру или названию фильма в таблице films на основании введенных символов в 'query'
+     */
+    @Override
+    public List<Film> search(String query, String by) {
+        String sqlDirector = "SELECT * " +
+                "FROM film " +
+                "WHERE director LIKE '%'?'%'";
+        String sqlTitle = "SELECT * " +
+                "FROM film " +
+                "WHERE name LIKE '%'?";
+        switch (by) {
+            case ("director,title"):
+                List<Film> directorTitleResultOfSearch = jdbcTemplate.query(sqlDirector, this::mapRowToFilm, query);
+                directorTitleResultOfSearch.addAll(jdbcTemplate.query(sqlTitle, this::mapRowToFilm, query));
+
+                return directorTitleResultOfSearch;
+            case ("director"):
+                return jdbcTemplate.query(sqlDirector, this::mapRowToFilm, query);
+            case ("title"):
+                return jdbcTemplate.query(sqlTitle, this::mapRowToFilm, query);
+            default:
+                break;
+        }
+        return null;
+    }
+
     @Override
     public void clear() {
         String sql = "delete from film";
@@ -156,6 +185,8 @@ public class FilmDbStorage implements FilmStorage {
         );
         film.setGenres(getGenresByFilmId(film.getId()));
         film.setLikes(getLikesByFilmId(film.getId()));
+        //Добавлено в соответствии с задачей по добавлению поиска
+        film.setDirector(getDirectorByFilmId(film.getId()));
         return film;
     }
 
@@ -169,6 +200,23 @@ public class FilmDbStorage implements FilmStorage {
                 id)
         );
         return genres.isEmpty() ? null : genres;
+    }
+
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Поиск режиссеров по film id и добавление в коллекцию режиссеров
+     */
+    private Set<Director> getDirectorByFilmId(long id) {
+        String sql = "select director, id from director D " +
+                "left join film_director FD on FD.direcor_id = D.id " +
+                "where film_id = ?";
+        Set<Director> director = new HashSet<>(jdbcTemplate.query(
+                sql,
+                (rs, num) -> new Director(rs.getInt("id"), rs.getString("name")),
+                id)
+        );
+        return director.isEmpty() ? null : director;
     }
 
     private Set<Long> getLikesByFilmId(long id) {

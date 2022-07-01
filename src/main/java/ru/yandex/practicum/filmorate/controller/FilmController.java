@@ -72,6 +72,18 @@ public class FilmController {
         return filmService.getPopular(count);
     }
 
+    /**
+     * @requestparam query строки поиска
+     * @requestparam by параметр поиска (director - поиск по режиссёру, title - поиск по названию)
+     * @author Grigory-PC
+     * <p>
+     * Ищет фильм по параметрам поиска
+     */
+    @GetMapping("search")
+    public List<Film> searchFilm(@RequestParam String query, @RequestParam String by) {
+        return filmService.searchFilm(query, by);
+    }
+
     private boolean isDateValid(Film film) {
         return film.getReleaseDate().isAfter(EARLIEST_DATE);
     }

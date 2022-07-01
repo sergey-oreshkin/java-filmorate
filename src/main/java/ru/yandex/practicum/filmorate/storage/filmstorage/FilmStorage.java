@@ -17,5 +17,7 @@ public interface FilmStorage {
 
     List<Film> getTop(int count);
 
+    List<Film> search(String query, String by);
+
     void clear();
 }

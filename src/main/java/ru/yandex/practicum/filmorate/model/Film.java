@@ -43,6 +43,11 @@ public class Film {
     @Setter
     Set<Genre> genres;
 
+    //Добавлено в соответствии с задачей по добавлению поиска
+    @NonFinal
+    @Setter
+    Set<Director> director;
+
     public int rate() {
         return likes.size();
     }
