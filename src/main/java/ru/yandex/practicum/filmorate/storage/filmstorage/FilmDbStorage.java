@@ -140,6 +140,47 @@ public class FilmDbStorage implements FilmStorage {
         return null;
     }
 
+     * @author aitski (Leonid Kvan)
+     * Метод возвращает фильмы, которые лайкнули оба юзера,
+     * отсортированные по кол-ву лайков по убыванию
+     * За основу взят метод getTop автора sergey-oreshkin.
+     * Также добавлен SQL запрос, который сначала создает таблицу cte
+     * с добавлением вспомогательной колонки count,
+     * которая показывает кол-во повторений film_id для каждой строки.
+     * Далее выбираются только те фильмы, у которых юзеры ?, ?
+     * И сортируется по убыванию count
+     */
+
+    public List<Film> getCommonFilms(long userId, long friendId){
+
+        String sql = 
+                "with cte as "+
+                    "(select likes.*, counter.count "+
+                        "from likes "+
+                        "left join ( "+
+                            "select likes.film_id, count(likes.film_id) as count "+
+                            "from likes "+
+                            "group by likes.film_id) "+
+                        "counter on counter.film_id = likes.film_id) "+
+                "select film_id from cte "+
+                "where user_id in (?,?) "+
+                "group by film_id, count "+
+                "having count(*)=2 "+
+                "order by count desc;";
+
+        List<Integer> idList = jdbcTemplate.query(sql, rs -> {
+            List<Integer> ids = new ArrayList<>();
+            while (rs.next()) {
+                ids.add(rs.getInt("film_id"));
+            }
+            return ids;
+        }, userId, friendId);
+        sql = "select * from film F " +
+                "join rating R on R.id=F.rating_id " +
+                "where F.id IN (" + String.join(",", Collections.nCopies(idList.size(), "?")) + ")";
+        return jdbcTemplate.query(sql, this::mapRowToFilm, idList.toArray());
+    }
+
     @Override
     public void clear() {
         String sql = "delete from film";
