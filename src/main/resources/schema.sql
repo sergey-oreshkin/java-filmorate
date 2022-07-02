@@ -1,4 +1,5 @@
-DROP TABLE IF EXISTS film_genre, likes, friendship, film, genre, rating;
+DROP TABLE IF EXISTS film_genre, likes, friendship, film, genre, rating, directors, users, reviews;
+
 
 CREATE TABLE IF NOT EXISTS users
 (
@@ -21,6 +22,12 @@ CREATE TABLE IF NOT EXISTS rating
     rating VARCHAR(10)
 );
 
+CREATE TABLE IF NOT EXISTS directors
+(
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(50)
+);
+
 CREATE TABLE IF NOT EXISTS film
 (
     id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -29,8 +36,11 @@ CREATE TABLE IF NOT EXISTS film
     release_date DATE,
     duration     INT,
     rating_id    INT,
+    director_id  INT,
     CONSTRAINT fk_rating
-        FOREIGN KEY (rating_id) REFERENCES rating (id) ON DELETE CASCADE
+        FOREIGN KEY (rating_id) REFERENCES rating (id) ON DELETE CASCADE,
+    CONSTRAINT fk_directors
+        FOREIGN KEY (director_id) REFERENCES directors (id)
 );
 
 CREATE TABLE IF NOT EXISTS friendship
@@ -68,3 +78,18 @@ CREATE TABLE IF NOT EXISTS film_genre
     CONSTRAINT film_genre_fk_genre
         FOREIGN KEY (genre_id) REFERENCES genre (id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS reviews
+(
+    id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    content      VARCHAR(3000),
+    isPositive   BOOLEAN,
+    userId       BIGINT,
+    filmId       BIGINT,
+    useful       INTEGER,
+    CONSTRAINT reviews_fk_users
+        FOREIGN KEY (userId) REFERENCES users (id),
+    CONSTRAINT reviews_fk_films
+        FOREIGN KEY (filmId) REFERENCES film (id)
+);
+
