@@ -3,8 +3,10 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.eventstorage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.filmstorage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
 
@@ -20,15 +22,29 @@ public class FilmService {
 
     private final UserStorage userStorage;
 
+    private final EventStorage eventStorage;
+
     public Film setLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
         film.getLikes().add(userId);
+        eventStorage.create(Event.builder()
+                .userId(userId)
+                .eventType("LIKE")
+                .operation("ADD")
+                .entityId(filmId)
+                .build());
         return filmStorage.update(film);
     }
 
     public Film deleteLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
         film.getLikes().remove(userId);
+        eventStorage.create(Event.builder()
+                .userId(userId)
+                .eventType("LIKE")
+                .operation("REMOVE")
+                .entityId(filmId)
+                .build());
         return filmStorage.update(film);
     }
 
@@ -42,25 +58,26 @@ public class FilmService {
      * остаются только фильмы, имеющие в списке жанров пункт, который соответствует переданному идентификатору.
      * Если в параметрах передается год, то список отфильтровывается таким образом, что в итоговом списке
      * остаются только фильмы, имеющие год выпуска, который соответствует переданному параметру.
-     * @param count - размер списка фильмов
+     *
+     * @param count   - размер списка фильмов
      * @param genreId - идентификатор жанра
-     * @param year - год выпуска
+     * @param year    - год выпуска
      * @return список List<Film> топ фильмов по количеству лайков, отфильтрованный по жанру и по году
      */
-    public List<Film> getPopularFiltered(int count, Optional<Integer> genreId, Optional<Integer> year){
+    public List<Film> getPopularFiltered(int count, Optional<Integer> genreId, Optional<Integer> year) {
         List<Film> filmList = filmStorage.getTop(count);
-        if (genreId.isPresent()){
-            filmList=filmList.stream()
-                    .filter(film -> film.getGenres()!=null)
+        if (genreId.isPresent()) {
+            filmList = filmList.stream()
+                    .filter(film -> film.getGenres() != null)
                     .filter(film -> film.getGenres().stream()
                             .map(Genre::getId)
                             .collect(Collectors.toList())
                             .contains(genreId.get()))
                     .collect(Collectors.toList());
         }
-        if (year.isPresent()){
-            filmList=filmList.stream()
-                    .filter(film -> film.getReleaseDate().getYear()==year.get())
+        if (year.isPresent()) {
+            filmList = filmList.stream()
+                    .filter(film -> film.getReleaseDate().getYear() == year.get())
                     .collect(Collectors.toList());
         }
         return filmList;

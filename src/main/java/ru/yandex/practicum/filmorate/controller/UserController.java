@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -64,5 +65,16 @@ public class UserController {
     @GetMapping("{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
         return userService.getCommonFriends(id, otherId);
+    }
+
+    /**
+     * @param id - идентификатор пользователя
+     * @return Возвращает ленту событий пользователя
+     * @author rs-popov
+     * Эндпойнт /users/{id}/feed [GET]
+     */
+    @GetMapping("{id}/feed")
+    public List<Event> getFeed(@PathVariable long id) {
+        return userService.getFeed(id);
     }
 }

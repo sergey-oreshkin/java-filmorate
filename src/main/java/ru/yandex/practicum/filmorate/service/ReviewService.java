@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.eventstorage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.filmstorage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.reviewstorage.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
@@ -29,19 +31,40 @@ public class ReviewService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
 
+    private final EventStorage eventStorage;
+
     public Review create(Review review) {
         validateFilmId(review.getFilmId());
         validateUserId(review.getUserId());
-        return reviewStorage.create(review);
+        Review created = reviewStorage.create(review);
+        eventStorage.create(Event.builder()
+                .userId(created.getUserId())
+                .eventType("REVIEW")
+                .operation("ADD")
+                .entityId(created.getId())
+                .build());
+        return created;
     }
 
     public Review update(Review review) {
         validateFilmId(review.getFilmId());
         validateUserId(review.getUserId());
+        eventStorage.create(Event.builder()
+                .userId(findById(review.getId()).getUserId())
+                .eventType("REVIEW")
+                .operation("UPDATE")
+                .entityId(review.getId())
+                .build());
         return reviewStorage.update(review);
     }
 
     public void delete(long id) {
+        eventStorage.create(Event.builder()
+                .userId(findById(id).getUserId())
+                .eventType("REVIEW")
+                .operation("REMOVE")
+                .entityId(id)
+                .build());
         reviewStorage.delete(id);
     }
 

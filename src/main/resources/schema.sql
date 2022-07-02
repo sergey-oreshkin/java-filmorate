@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS film_genre, likes, friendship, film, genre, rating, directors, users, reviews;
+DROP TABLE IF EXISTS film_genre, likes, friendship, film, genre, rating, directors, users, reviews, events;
 
 
 CREATE TABLE IF NOT EXISTS users
@@ -93,3 +93,14 @@ CREATE TABLE IF NOT EXISTS reviews
         FOREIGN KEY (filmId) REFERENCES film (id)
 );
 
+CREATE TABLE IF NOT EXISTS events
+(
+    event_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id     BIGINT,
+    entity_id   BIGINT,
+    eventType   VARCHAR(10),
+    operation   VARCHAR(10),
+    event_time  BIGINT,
+    CONSTRAINT fk_events_users
+        FOREIGN KEY (user_id) REFERENCES users (id)
+);
