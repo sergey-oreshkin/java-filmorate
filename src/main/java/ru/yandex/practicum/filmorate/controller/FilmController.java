@@ -83,6 +83,14 @@ public class FilmController {
         return filmService.getPopularFiltered(count, genreId, year);
     }
 
+    @GetMapping("common")
+    public List<Film> getCommonFilms(
+            @RequestParam() long userId,
+            @RequestParam() long friendId
+            ) {
+        return filmService.getCommonFilms(userId,friendId);
+    }
+
     private boolean isDateValid(Film film) {
         return film.getReleaseDate().isAfter(EARLIEST_DATE);
     }
