@@ -91,8 +91,7 @@ public class UserService {
             });
         });
 
-        freqMatrix.values().removeIf(v -> v == 0);
-        diffMatrix.keySet().removeIf(k -> !freqMatrix.containsKey(k));
+        diffMatrix.keySet().removeIf(k -> freqMatrix.get(k) == 0);
 
         diffMatrix.forEach((userId, likes) -> likes.forEach((filmId, diffLike) -> {
             if (diffLike == 0 && matrix.get(userId).get(filmId) == 1) {
