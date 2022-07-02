@@ -65,6 +65,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        return null;
+    }
+
+
+    @Override
     public void clear() {
         nextId = 0;
         films.clear();

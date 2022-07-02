@@ -36,6 +36,13 @@ public class FilmService {
         return filmStorage.getTop(count);
     }
 
+
+    public List<Film> getCommonFilms (long userId, long friendId) {
+        validateUserId(userId);
+        validateUserId(friendId);
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
     /**
      * Возвращает список из первых count фильмов по количеству лайков. Если в параметрах
      * передано значение идентификатора жанра, список отфильтровывается, и в итоговом списке
@@ -64,6 +71,7 @@ public class FilmService {
                     .collect(Collectors.toList());
         }
         return filmList;
+
     }
 
     public List<Film> getAll() {
@@ -99,4 +107,10 @@ public class FilmService {
         return filmStorage.findById(filmId)
                 .orElseThrow(() -> new NotFoundException("Film with id=" + filmId + " not found"));
     }
+
+    private void validateUserId(long userId) {
+        userStorage.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
+    }
+
 }

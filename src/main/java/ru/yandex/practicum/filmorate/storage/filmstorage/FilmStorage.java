@@ -19,5 +19,7 @@ public interface FilmStorage {
 
     boolean delete(Film film);
 
+    List<Film> getCommonFilms(long userId, long friendId);
+
     void clear();
 }
