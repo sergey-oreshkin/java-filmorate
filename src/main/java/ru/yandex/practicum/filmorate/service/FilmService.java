@@ -36,11 +36,12 @@ public class FilmService {
         return filmStorage.getTop(count);
     }
 
- add-common-films
-    public List<Film> getCommonFilms (long userId, long friendId){
+
+    public List<Film> getCommonFilms (long userId, long friendId) {
         validateUserId(userId);
         validateUserId(friendId);
-        return filmStorage.getCommonFilms(userId,friendId);
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
 
     /**
      * Возвращает список из первых count фильмов по количеству лайков. Если в параметрах
@@ -70,7 +71,7 @@ public class FilmService {
                     .collect(Collectors.toList());
         }
         return filmList;
->>>
+
     }
 
     public List<Film> getAll() {
