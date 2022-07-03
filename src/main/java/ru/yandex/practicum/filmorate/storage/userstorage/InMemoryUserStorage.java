@@ -43,6 +43,17 @@ public class InMemoryUserStorage implements UserStorage {
         return Optional.empty();
     }
 
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Удаление пользователя из мапы
+     * Метод не реализован ввиду ненадобности
+     */
+    @Override
+    public boolean delete(User user) {
+        return false;
+    }
+
     @Override
     public void clear() {
         users.clear();
