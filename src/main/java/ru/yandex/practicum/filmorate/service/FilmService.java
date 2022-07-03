@@ -91,6 +91,15 @@ public class FilmService {
                 .orElseThrow(() -> new NotFoundException("Film with id=" + id + " not found"));
     }
 
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Удаление фильма из таблицы
+     */
+    public boolean delete(long id) {
+        return filmStorage.delete(getById(id));
+    }
+
     private Film validateAndGetFilm(long filmId, long userId) {
         userStorage.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));

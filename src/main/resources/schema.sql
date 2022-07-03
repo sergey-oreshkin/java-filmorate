@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS film
     rating_id    INT,
     director_id  INT,
     CONSTRAINT fk_rating
-        FOREIGN KEY (rating_id) REFERENCES rating (id),
+        FOREIGN KEY (rating_id) REFERENCES rating (id) ON DELETE CASCADE,
     CONSTRAINT fk_directors
         FOREIGN KEY (director_id) REFERENCES directors (id)
 );
@@ -51,9 +51,9 @@ CREATE TABLE IF NOT EXISTS friendship
     CONSTRAINT friendship_pk
         PRIMARY KEY (user_id, friend_id),
     CONSTRAINT users
-        FOREIGN KEY (user_id) REFERENCES users (id),
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT friend
-        FOREIGN KEY (friend_id) REFERENCES users (id)
+        FOREIGN KEY (friend_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS likes
@@ -63,9 +63,9 @@ CREATE TABLE IF NOT EXISTS likes
     CONSTRAINT likes_pk
         PRIMARY KEY (film_id, user_id),
     CONSTRAINT fk_film
-        FOREIGN KEY (film_id) REFERENCES film (id),
+        FOREIGN KEY (film_id) REFERENCES film (id) ON DELETE CASCADE,
     CONSTRAINT fk_users
-        FOREIGN KEY (user_id) REFERENCES users (id)
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS film_genre
@@ -75,9 +75,9 @@ CREATE TABLE IF NOT EXISTS film_genre
     CONSTRAINT film_genre_pk
         PRIMARY KEY (film_id, genre_id),
     CONSTRAINT film_genre_fk_film
-        FOREIGN KEY (film_id) REFERENCES film (id),
+        FOREIGN KEY (film_id) REFERENCES film (id) ON DELETE CASCADE,
     CONSTRAINT film_genre_fk_genre
-        FOREIGN KEY (genre_id) REFERENCES genre (id)
+        FOREIGN KEY (genre_id) REFERENCES genre (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS reviews

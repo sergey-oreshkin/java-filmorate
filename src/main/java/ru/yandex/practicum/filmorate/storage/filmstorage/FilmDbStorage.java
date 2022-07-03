@@ -112,6 +112,17 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     /**
+     * @author Grigory-PC
+     * <p>
+     * Удаление фильма из таблицы film
+     */
+    @Override
+    public boolean delete(Film film) {
+        String sql = "DELETE FROM film WHERE id = ?";
+
+        return jdbcTemplate.update(sql, film.getId()) > 0;
+    }
+
      * @author aitski (Leonid Kvan)
      * Метод возвращает фильмы, которые лайкнули оба юзера,
      * отсортированные по кол-ву лайков по убыванию
