@@ -62,4 +62,13 @@ public class UserService {
         return userStorage.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
     }
+
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Удаление пользователя из таблицы
+     */
+    public boolean delete(long id) {
+        return userStorage.delete(getById(id));
+    }
 }

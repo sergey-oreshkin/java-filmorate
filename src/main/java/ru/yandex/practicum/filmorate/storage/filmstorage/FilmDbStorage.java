@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -51,6 +52,7 @@ public class FilmDbStorage implements FilmStorage {
 
         film.setId(num.longValue());
         updateGenres(film);
+        updateDirectors(film);
         return film;
     }
 
@@ -76,6 +78,7 @@ public class FilmDbStorage implements FilmStorage {
         );
         updateGenres(film);
         updateLikes(film);
+        updateDirectors(film);
         return film;
     }
 
@@ -138,6 +141,15 @@ public class FilmDbStorage implements FilmStorage {
                 break;
         }
         return null;
+     }
+     
+     /**
+     * Удаление фильма из таблицы film
+     */
+    @Override
+    public boolean delete(Film film) {
+        String sql = "DELETE FROM film WHERE id = ?";
+        return jdbcTemplate.update(sql, film.getId()) > 0;
     }
 
      * @author aitski (Leonid Kvan)
@@ -187,6 +199,33 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sql);
     }
 
+    /**
+     * Метод для получения списка фильмов режиссера, отсортированные по лайкам(likes) или году релиза(year)
+     * @author Vladimir Arlhipenko
+     * @param directorId - идентификатор режиссера по которому готовится список фильмов
+     * @param sortBy - выбираемый тип сортировки (допустимы значения year(по году релиза), likes(по количеству лайков))
+     *               default значение "likes"
+     * @return List<Film> - список фильмов
+     */
+    @Override
+    public List<Film> getDirectorFilms(long directorId, String sortBy) {
+        String sql = "select * from film as F " +
+                "left join rating as R on R.id=F.rating_id " +
+                "join film_director as FD on FD.film_id=F.id " +
+                "left join likes as L on L.film_id=F.id " +
+                "where FD.director_id=? " +
+                "group by F.id " +
+                "order by count(L.user_id)";
+        if (sortBy.equals("year")) {
+            sql = "select * from film as F " +
+                    "left join rating R on R.id=F.rating_id " +
+                    "join film_director as FD on FD.film_id=F.id " +
+                    "where FD.director_id=? " +
+                    "order by extract(year from cast(release_date as date))";
+        }
+        return jdbcTemplate.query(sql, this::mapRowToFilm, directorId);
+    }
+
     private void updateLikes(Film film) {
         String deleteSql = "delete from likes where film_id=?";
         String insertSql = "insert into likes (film_id, user_id) values(?,?)";
@@ -210,6 +249,23 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    /**
+     * Метод для обновления таблицы film_director (связывает фильм с режиссерами)
+     * @author Vladimir Arlhipenko
+     * @param film - фильм который необходимо обновить
+     */
+    private void updateDirectors(Film film) {
+        String deleteSql = "delete from film_director where film_id=?";
+        String insertSql = "insert into film_director (film_id, director_id) values(?,?)";
+
+        jdbcTemplate.update(deleteSql, film.getId());
+        if (film.getDirectors() != null) {
+            film.getDirectors().stream()
+                    .map(Director::getId)
+                    .forEach(id -> jdbcTemplate.update(insertSql, film.getId(), id));
+        }
+    }
+
     private Film mapRowToFilm(ResultSet rs, int rowNum) throws SQLException {
         if (rs.getRow() == 0) {
             throw new NotFoundException("Film not found");
@@ -222,12 +278,12 @@ public class FilmDbStorage implements FilmStorage {
                 rs.getDate("release_date").toLocalDate(),
                 rs.getInt("duration"),
                 null,
+                null,
                 null
         );
         film.setGenres(getGenresByFilmId(film.getId()));
         film.setLikes(getLikesByFilmId(film.getId()));
-        //Добавлено в соответствии с задачей по добавлению поиска
-        film.setDirector(getDirectorByFilmId(film.getId()));
+        film.setDirectors(getDirectorsByFilmId(film.getId()));
         return film;
     }
 
@@ -265,5 +321,22 @@ public class FilmDbStorage implements FilmStorage {
         return new HashSet<>(
                 jdbcTemplate.query(sql, (rs, num) -> rs.getLong("user_id"), id)
         );
+    }
+
+    /**
+     * Метод для получения множества режиссеров, снявших фильм, по id фильма
+     * @author Vladimir Arlhipenko
+     * @param filmId - id фильма для которого необходимо получить множество режиссеров
+     */
+    private Set<Director> getDirectorsByFilmId(long filmId) {
+        String sql = "select id, name from directors D " +
+                "left join film_director FD on FD.director_id=D.id " +
+                "where FD.film_id=?";
+        Set<Director> directors = new HashSet<>(jdbcTemplate.query(
+                sql,
+                (rs, rowNum) -> new Director(rs.getLong("id"), rs.getString("name")),
+                filmId)
+        );
+        return directors.isEmpty() ? new HashSet<>() : directors;
     }
 }

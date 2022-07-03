@@ -15,5 +15,7 @@ public interface UserStorage {
 
     Optional<User> findById(long id);
 
+    boolean delete(User user);
+
     void clear();
 }

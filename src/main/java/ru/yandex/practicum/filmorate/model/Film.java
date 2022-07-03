@@ -43,10 +43,13 @@ public class Film {
     @Setter
     Set<Genre> genres;
 
-    //Добавлено в соответствии с задачей по добавлению поиска
+    /**
+     * Множество для хранения режиссеров фильма
+     * @author Vladimir Arlhipenko
+     */
     @NonFinal
     @Setter
-    Set<Director> director;
+    Set<Director> directors;
 
     public int rate() {
         return likes.size();

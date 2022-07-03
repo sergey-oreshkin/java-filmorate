@@ -83,6 +83,18 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Удаление пользователя из таблицы users
+     */
+    @Override
+    public boolean delete(User user) {
+        String sql = "DELETE FROM users WHERE id = ?";
+
+        return jdbcTemplate.update(sql, user.getId()) > 0;
+    }
+
     @Override
     public void clear() {
         String sql = "delete from users";
