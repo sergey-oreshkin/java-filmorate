@@ -17,6 +17,10 @@ public interface FilmStorage {
 
     List<Film> getTop(int count);
 
+    boolean delete(Film film);
+
+    List<Film> getCommonFilms(long userId, long friendId);
+
     void clear();
 
     /**

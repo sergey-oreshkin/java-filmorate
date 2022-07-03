@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/films")
@@ -52,6 +53,17 @@ public class FilmController {
         );
     }
 
+    /**
+     * @param id фильма, который удалют
+     * @author Grigory-PC
+     * <p>
+     * Удаляет фильм из таблицы
+     */
+    @DeleteMapping("/{id}")
+    public void deleteFilm(@Valid @PathVariable long id) {
+        filmService.delete(id);
+    }
+
     @GetMapping("{id}")
     public Film getById(@PathVariable long id) {
         return filmService.getById(id);
@@ -67,9 +79,27 @@ public class FilmController {
         return filmService.deleteLike(id, userId);
     }
 
+    /**
+     * Эндпойнт /films/popular?count={limit}&genreId={genreId}&year={year} [GET]
+     * @param count - размер списка фильмов (если не указан, то count=10)
+     * @param genreId - идентификатор жанра
+     * @param year - год выпуска
+     * @return Возвращает список самых популярных фильмов указанного жанра за нужный год
+     */
     @GetMapping("popular")
-    public List<Film> getPopular(@RequestParam(defaultValue = "10") int count) {
-        return filmService.getPopular(count);
+    public List<Film> getPopular(
+            @RequestParam(value = "count", defaultValue = "10", required = false) int count,
+            @RequestParam(value = "genreId", required = false) Optional<Integer> genreId,
+            @RequestParam(value = "year", required = false) Optional<Integer> year) {
+        return filmService.getPopularFiltered(count, genreId, year);
+    }
+
+    @GetMapping("common")
+    public List<Film> getCommonFilms(
+            @RequestParam() long userId,
+            @RequestParam() long friendId
+            ) {
+        return filmService.getCommonFilms(userId,friendId);
     }
 
     /**
