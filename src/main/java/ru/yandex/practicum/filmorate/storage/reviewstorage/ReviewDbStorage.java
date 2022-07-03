@@ -17,10 +17,10 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-    /**
-     * @author aitski (Leonid Kvan)
-     * Класс для связи с базой данных по функции "Отзывы"
-     */
+/**
+ * @author aitski (Leonid Kvan)
+ * Класс для связи с базой данных по функции "Отзывы"
+ */
 
 @Component
 @Primary

@@ -1,5 +1,6 @@
 /**
  * Имлиментация интерфейса DirectorStorage DAO класс для таблицы Directors(Режиссеры)
+ *
  * @author Vladimir Arkhipenko
  */
 package ru.yandex.practicum.filmorate.storage.directorstorage;
@@ -34,9 +35,9 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public List<Director> getAll() {
-       String sql = "select * from directors";
-       List<Director> allDirectors = new ArrayList<>(jdbcTemplate.query(sql, this::mapRowToDirector));
-       return allDirectors.isEmpty() ? new ArrayList<>() : allDirectors;
+        String sql = "select * from directors";
+        List<Director> allDirectors = new ArrayList<>(jdbcTemplate.query(sql, this::mapRowToDirector));
+        return allDirectors.isEmpty() ? new ArrayList<>() : allDirectors;
     }
 
     @Override
@@ -84,9 +85,9 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     private Director mapRowToDirector(ResultSet rs, int rowNum) throws SQLException {
-       if (rs.getRow() == 0) {
-          throw new NotFoundException("Director not found");
-       }
-       return new Director(rs.getLong("id"), rs.getString("name"));
+        if (rs.getRow() == 0) {
+            throw new NotFoundException("Director not found");
+        }
+        return new Director(rs.getLong("id"), rs.getString("name"));
     }
 }

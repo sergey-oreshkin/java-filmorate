@@ -1,5 +1,6 @@
 /**
  * Класс данных режиссер
+ *
  * @author Vladimir Arkhipenko
  */
 package ru.yandex.practicum.filmorate.model;

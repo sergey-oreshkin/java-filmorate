@@ -113,7 +113,7 @@ public class FilmController {
     public List<Film> searchFilm(@RequestParam String query, @RequestParam String by) {
         return filmService.searchFilm(query, by);
     }
-    
+    /**
      * Эндпоинт для получения списка фильмов режиссера, отсортированные по лайкам или году релиза
      * @author Vladimir Arlhipenko
      * @param directorId - идентификатор режиссера по которому готовится список фильмов

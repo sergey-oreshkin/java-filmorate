@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
@@ -64,7 +63,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public List<Film> search(String query, String by) {
         return null;
     }
-    
+
     /**
      * Удаление фильма из мапы
      * Метод не реализован ввиду ненадобности
@@ -88,6 +87,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     /**
      * Заглушка для метода
+     *
      * @author Vladimir Arlhipenko
      */
     @Override

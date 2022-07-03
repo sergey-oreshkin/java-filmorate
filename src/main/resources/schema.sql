@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS rating
 
 CREATE TABLE IF NOT EXISTS directors
 (
-    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(50)
 );
 
@@ -41,14 +41,12 @@ CREATE TABLE IF NOT EXISTS film
 
 CREATE TABLE IF NOT EXISTS film_director
 (
-    film_id  BIGINT,
+    film_id     BIGINT,
     director_id BIGINT,
     CONSTRAINT film_director_pk
         PRIMARY KEY (film_id, director_id),
     CONSTRAINT film_director_fk_film
         FOREIGN KEY (film_id) REFERENCES film (id),
-    CONSTRAINT film_director_fk_directors
-        FOREIGN KEY (rating_id) REFERENCES rating (id) ,
     CONSTRAINT fk_directors
         FOREIGN KEY (director_id) REFERENCES directors (id)
 );
@@ -91,12 +89,12 @@ CREATE TABLE IF NOT EXISTS film_genre
 
 CREATE TABLE IF NOT EXISTS reviews
 (
-    id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    content      VARCHAR(3000),
-    isPositive   BOOLEAN,
-    userId       BIGINT,
-    filmId       BIGINT,
-    useful       INTEGER,
+    id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    content    VARCHAR(3000),
+    isPositive BOOLEAN,
+    userId     BIGINT,
+    filmId     BIGINT,
+    useful     INTEGER,
     CONSTRAINT reviews_fk_users
         FOREIGN KEY (userId) REFERENCES users (id),
     CONSTRAINT reviews_fk_films

@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Value
@@ -45,6 +44,7 @@ public class Film {
 
     /**
      * Множество для хранения режиссеров фильма
+     *
      * @author Vladimir Arlhipenko
      */
     @NonFinal

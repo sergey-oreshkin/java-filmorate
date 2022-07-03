@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.directorstorage.DirectorStorage;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.directorstorage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.filmstorage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
 
@@ -40,7 +40,7 @@ public class FilmService {
     }
 
 
-    public List<Film> getCommonFilms (long userId, long friendId) {
+    public List<Film> getCommonFilms(long userId, long friendId) {
         validateUserId(userId);
         validateUserId(friendId);
         return filmStorage.getCommonFilms(userId, friendId);
@@ -52,25 +52,26 @@ public class FilmService {
      * остаются только фильмы, имеющие в списке жанров пункт, который соответствует переданному идентификатору.
      * Если в параметрах передается год, то список отфильтровывается таким образом, что в итоговом списке
      * остаются только фильмы, имеющие год выпуска, который соответствует переданному параметру.
-     * @param count - размер списка фильмов
+     *
+     * @param count   - размер списка фильмов
      * @param genreId - идентификатор жанра
-     * @param year - год выпуска
+     * @param year    - год выпуска
      * @return список List<Film> топ фильмов по количеству лайков, отфильтрованный по жанру и по году
      */
-    public List<Film> getPopularFiltered(int count, Optional<Integer> genreId, Optional<Integer> year){
+    public List<Film> getPopularFiltered(int count, Optional<Integer> genreId, Optional<Integer> year) {
         List<Film> filmList = filmStorage.getTop(count);
-        if (genreId.isPresent()){
-            filmList=filmList.stream()
-                    .filter(film -> film.getGenres()!=null)
+        if (genreId.isPresent()) {
+            filmList = filmList.stream()
+                    .filter(film -> film.getGenres() != null)
                     .filter(film -> film.getGenres().stream()
                             .map(Genre::getId)
                             .collect(Collectors.toList())
                             .contains(genreId.get()))
                     .collect(Collectors.toList());
         }
-        if (year.isPresent()){
-            filmList=filmList.stream()
-                    .filter(film -> film.getReleaseDate().getYear()==year.get())
+        if (year.isPresent()) {
+            filmList = filmList.stream()
+                    .filter(film -> film.getReleaseDate().getYear() == year.get())
                     .collect(Collectors.toList());
         }
         return filmList;
@@ -102,14 +103,16 @@ public class FilmService {
     public List<Film> searchFilm(String query, String by) {
         return filmStorage.search(query, by);
     }
-    
+
+    /**
      * Метод для получения списка фильмов режиссера, отсортированные по лайкам(likes) или году релиза(year)
      * так же в методе проверяется корректность переданного directorId
-     * @author Vladimir Arlhipenko
+     *
      * @param directorId - идентификатор режиссера по которому готовится список фильмов
-     * @param sortBy - выбираемый тип сортировки (допустимы значения year(по году релиза), likes(по количеству лайков))
-     *               default значение "likes"
+     * @param sortBy     - выбираемый тип сортировки (допустимы значения year(по году релиза), likes(по количеству лайков))
+     *                   default значение "likes"
      * @return List<Film> - список фильмов
+     * @author Vladimir Arlhipenko
      */
     public List<Film> getDirectorFilms(long directorId, String sortBy) {
         if (directorStorage.findById(directorId).isEmpty()) {
@@ -117,7 +120,8 @@ public class FilmService {
         }
         return filmStorage.getDirectorFilms(directorId, sortBy);
     }
-    
+
+    /**
      * @author Grigory-PC
      * <p>
      * Удаление фильма из таблицы

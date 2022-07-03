@@ -141,9 +141,9 @@ public class FilmDbStorage implements FilmStorage {
                 break;
         }
         return null;
-     }
-     
-     /**
+    }
+
+    /**
      * Удаление фильма из таблицы film
      */
     @Override
@@ -152,6 +152,7 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.update(sql, film.getId()) > 0;
     }
 
+    /**
      * @author aitski (Leonid Kvan)
      * Метод возвращает фильмы, которые лайкнули оба юзера,
      * отсортированные по кол-ву лайков по убыванию
@@ -162,23 +163,22 @@ public class FilmDbStorage implements FilmStorage {
      * Далее выбираются только те фильмы, у которых юзеры ?, ?
      * И сортируется по убыванию count
      */
+    public List<Film> getCommonFilms(long userId, long friendId) {
 
-    public List<Film> getCommonFilms(long userId, long friendId){
-
-        String sql = 
-                "with cte as "+
-                    "(select likes.*, counter.count "+
-                        "from likes "+
-                        "left join ( "+
-                            "select likes.film_id, count(likes.film_id) as count "+
-                            "from likes "+
-                            "group by likes.film_id) "+
-                        "counter on counter.film_id = likes.film_id) "+
-                "select film_id from cte "+
-                "where user_id in (?,?) "+
-                "group by film_id, count "+
-                "having count(*)=2 "+
-                "order by count desc;";
+        String sql =
+                "with cte as " +
+                        "(select likes.*, counter.count " +
+                        "from likes " +
+                        "left join ( " +
+                        "select likes.film_id, count(likes.film_id) as count " +
+                        "from likes " +
+                        "group by likes.film_id) " +
+                        "counter on counter.film_id = likes.film_id) " +
+                        "select film_id from cte " +
+                        "where user_id in (?,?) " +
+                        "group by film_id, count " +
+                        "having count(*)=2 " +
+                        "order by count desc;";
 
         List<Integer> idList = jdbcTemplate.query(sql, rs -> {
             List<Integer> ids = new ArrayList<>();
@@ -201,11 +201,12 @@ public class FilmDbStorage implements FilmStorage {
 
     /**
      * Метод для получения списка фильмов режиссера, отсортированные по лайкам(likes) или году релиза(year)
-     * @author Vladimir Arlhipenko
+     *
      * @param directorId - идентификатор режиссера по которому готовится список фильмов
-     * @param sortBy - выбираемый тип сортировки (допустимы значения year(по году релиза), likes(по количеству лайков))
-     *               default значение "likes"
+     * @param sortBy     - выбираемый тип сортировки (допустимы значения year(по году релиза), likes(по количеству лайков))
+     *                   default значение "likes"
      * @return List<Film> - список фильмов
+     * @author Vladimir Arlhipenko
      */
     @Override
     public List<Film> getDirectorFilms(long directorId, String sortBy) {
@@ -251,8 +252,9 @@ public class FilmDbStorage implements FilmStorage {
 
     /**
      * Метод для обновления таблицы film_director (связывает фильм с режиссерами)
-     * @author Vladimir Arlhipenko
+     *
      * @param film - фильм который необходимо обновить
+     * @author Vladimir Arlhipenko
      */
     private void updateDirectors(Film film) {
         String deleteSql = "delete from film_director where film_id=?";
@@ -325,8 +327,9 @@ public class FilmDbStorage implements FilmStorage {
 
     /**
      * Метод для получения множества режиссеров, снявших фильм, по id фильма
-     * @author Vladimir Arlhipenko
+     *
      * @param filmId - id фильма для которого необходимо получить множество режиссеров
+     * @author Vladimir Arlhipenko
      */
     private Set<Director> getDirectorsByFilmId(long filmId) {
         String sql = "select id, name from directors D " +

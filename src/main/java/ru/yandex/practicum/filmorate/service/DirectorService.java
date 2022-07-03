@@ -1,5 +1,6 @@
 /**
  * Сервис для взаимодействия c хранилищем DirectorStorage
+ *
  * @author Vladimir Arkhipenko
  */
 package ru.yandex.practicum.filmorate.service;

@@ -1,5 +1,6 @@
 /**
  * Контроллер для работы с эндпоинтами /directors
+ *
  * @author Vladimir Arkhipenko
  */
 package ru.yandex.practicum.filmorate.controller;

@@ -8,10 +8,10 @@ import lombok.experimental.NonFinal;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-    /**
-     * @author aitski (Leonid Kvan)
-     * Базовый класс с полями по функции "Отзывы"
-     */
+/**
+ * @author aitski (Leonid Kvan)
+ * Базовый класс с полями по функции "Отзывы"
+ */
 
 @Value
 public class Review {

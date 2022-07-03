@@ -36,7 +36,7 @@ public class GenreDBStorage implements GenreStorage {
         }
     }
 
-    private Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException{
+    private Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException {
         if (rs.getRow() == 0) {
             throw new NotFoundException("Genre not found");
         }
