@@ -46,9 +46,9 @@ CREATE TABLE IF NOT EXISTS film_director
     CONSTRAINT film_director_pk
         PRIMARY KEY (film_id, director_id),
     CONSTRAINT film_director_fk_film
-        FOREIGN KEY (film_id) REFERENCES film (id),
+        FOREIGN KEY (film_id) REFERENCES film (id) ON DELETE CASCADE,
     CONSTRAINT fk_directors
-        FOREIGN KEY (director_id) REFERENCES directors (id)
+        FOREIGN KEY (director_id) REFERENCES directors (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS friendship
@@ -96,8 +96,8 @@ CREATE TABLE IF NOT EXISTS reviews
     filmId     BIGINT,
     useful     INTEGER,
     CONSTRAINT reviews_fk_users
-        FOREIGN KEY (userId) REFERENCES users (id),
+        FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT reviews_fk_films
-        FOREIGN KEY (filmId) REFERENCES film (id)
+        FOREIGN KEY (filmId) REFERENCES film (id) ON DELETE CASCADE
 );
 
