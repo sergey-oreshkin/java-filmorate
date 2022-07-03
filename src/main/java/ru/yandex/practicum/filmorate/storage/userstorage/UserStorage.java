@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.userstorage;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface UserStorage {
@@ -18,4 +19,6 @@ public interface UserStorage {
     boolean delete(User user);
 
     void clear();
+
+    Map<Long, Map<Long, Integer>> getLikesMatrix();
 }

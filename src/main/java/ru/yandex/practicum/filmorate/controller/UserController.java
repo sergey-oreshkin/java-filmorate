@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -76,4 +77,16 @@ public class UserController {
     public List<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
         return userService.getCommonFriends(id, otherId);
     }
+
+    /**
+     * Эндпоинт для получения списка рекомендованных фильмов для конкретного юзера
+     * @author sergey-oreshkin
+     * @param id - идентификатор юзера для которого готовятся рекомендации
+     * @return List<Film> - список рекомендованных фильмов основанный на коллаборативной фильтрации
+     */
+    @GetMapping("{id}/recommendations")
+    public List<Film> getRecommendation(@PathVariable long id) {
+        return userService.getRecommendation(id);
+    }
 }
+

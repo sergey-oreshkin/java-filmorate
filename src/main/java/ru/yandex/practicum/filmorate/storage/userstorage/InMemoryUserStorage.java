@@ -60,6 +60,11 @@ public class InMemoryUserStorage implements UserStorage {
         nextId = 0;
     }
 
+    @Override
+    public Map<Long, Map<Long, Integer>> getLikesMatrix() {
+        return null; // TODO throw MethodNotImplemented
+    }
+
     private long getNextId() {
         return ++nextId;
     }
