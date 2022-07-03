@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.model.Event;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -41,7 +43,7 @@ public class EventDBStorage implements EventStorage {
                 .addValue("entity_id", event.getEntityId())
                 .addValue("eventType", event.getEventType())
                 .addValue("operation", event.getOperation())
-                .addValue("event_time", event.getTimestamp());
+                .addValue("event_time", Timestamp.valueOf(LocalDateTime.now()));
 
         Number num = jdbcInsert.executeAndReturnKey(parameters);
         event.setEventId(num.longValue());
@@ -58,7 +60,7 @@ public class EventDBStorage implements EventStorage {
                 .entityId(rs.getLong("entity_id"))
                 .eventType(rs.getString("eventType"))
                 .operation(rs.getString("operation"))
-                .timestamp(rs.getLong("event_time"))
+                .timestamp(rs.getTimestamp("event_time").getTime())
                 .build();
     }
 }

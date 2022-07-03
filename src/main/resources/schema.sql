@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS events
     entity_id   BIGINT,
     eventType   VARCHAR(10),
     operation   VARCHAR(10),
-    event_time  BIGINT,
+    event_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_events_users
-        FOREIGN KEY (user_id) REFERENCES users (id)
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );

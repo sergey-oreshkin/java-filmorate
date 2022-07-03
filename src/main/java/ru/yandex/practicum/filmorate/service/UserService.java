@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.feedAOP.CreatingEvent;
+import ru.yandex.practicum.filmorate.feedAOP.RemovingEvent;
 import ru.yandex.practicum.filmorate.storage.eventstorage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
 
@@ -20,29 +22,19 @@ public class UserService {
 
     private final EventStorage eventStorage;
 
+    @CreatingEvent
     public User addFriend(long userId, long friendId) {
         User user = getById(userId);
         getById(friendId); //validate friendId
         user.getFriends().add(friendId);
-        eventStorage.create(Event.builder()
-                .userId(userId)
-                .eventType("FRIEND")
-                .operation("ADD")
-                .entityId(friendId)
-                .build());
         return userStorage.update(user);
     }
 
+    @RemovingEvent
     public User deleteFriend(long userId, long friendId) {
         User user = getById(userId);
         getById(friendId); //validate friendId
         user.getFriends().remove(friendId);
-        eventStorage.create(Event.builder()
-                .userId(userId)
-                .eventType("FRIEND")
-                .operation("REMOVE")
-                .entityId(friendId)
-                .build());
         return userStorage.update(user);
     }
 

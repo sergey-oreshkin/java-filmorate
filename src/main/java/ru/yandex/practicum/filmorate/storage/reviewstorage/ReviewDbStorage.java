@@ -66,10 +66,12 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public void delete(long id) {
-        validateId(id);
+    public Review delete(long id) {
+        Review review = findById(id)
+                .orElseThrow(()->new NotFoundException("Review with id=" + id + " does not exist"));
         String sql = "delete from reviews where id=?";
         jdbcTemplate.update(sql, id);
+        return review;
     }
 
     @Override

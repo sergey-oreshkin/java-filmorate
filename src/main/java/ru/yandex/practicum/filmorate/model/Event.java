@@ -33,6 +33,5 @@ public class Event {
     String operation;
 
     @NonNull
-    @Builder.Default
-    long timestamp = System.currentTimeMillis();
+    long timestamp;
 }

@@ -9,7 +9,7 @@ public interface ReviewStorage {
 
     Review create(Review review);
     Review update(Review review);
-    void delete (long id);
+    Review delete (long id);
     Optional<Review> findById(long id);
 
     List<Review> getReviewsByIdLimited (long filmId, int count);

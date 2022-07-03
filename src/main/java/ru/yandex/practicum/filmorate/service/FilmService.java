@@ -3,10 +3,10 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.eventstorage.EventStorage;
+import ru.yandex.practicum.filmorate.feedAOP.CreatingEvent;
+import ru.yandex.practicum.filmorate.feedAOP.RemovingEvent;
 import ru.yandex.practicum.filmorate.storage.filmstorage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
 
@@ -22,29 +22,17 @@ public class FilmService {
 
     private final UserStorage userStorage;
 
-    private final EventStorage eventStorage;
-
+    @CreatingEvent
     public Film setLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
         film.getLikes().add(userId);
-        eventStorage.create(Event.builder()
-                .userId(userId)
-                .eventType("LIKE")
-                .operation("ADD")
-                .entityId(filmId)
-                .build());
         return filmStorage.update(film);
     }
 
+    @RemovingEvent
     public Film deleteLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
         film.getLikes().remove(userId);
-        eventStorage.create(Event.builder()
-                .userId(userId)
-                .eventType("LIKE")
-                .operation("REMOVE")
-                .entityId(filmId)
-                .build());
         return filmStorage.update(film);
     }
 
