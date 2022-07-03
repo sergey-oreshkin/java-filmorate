@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.feedAOP.CreatingEvent;
+import ru.yandex.practicum.filmorate.feedAOP.RemovingEvent;
 import ru.yandex.practicum.filmorate.storage.directorstorage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.filmstorage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
@@ -23,12 +25,14 @@ public class FilmService {
 
     private final DirectorStorage directorStorage;
 
+    @CreatingEvent
     public Film setLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
         film.getLikes().add(userId);
         return filmStorage.update(film);
     }
 
+    @RemovingEvent
     public Film deleteLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
         film.getLikes().remove(userId);

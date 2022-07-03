@@ -3,6 +3,11 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.feedAOP.CreatingEvent;
+import ru.yandex.practicum.filmorate.feedAOP.RemovingEvent;
+import ru.yandex.practicum.filmorate.storage.eventstorage.EventStorage;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.filmstorage.FilmStorage;
@@ -18,6 +23,9 @@ public class UserService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
 
+    private final EventStorage eventStorage;
+
+    @CreatingEvent
     public User addFriend(long userId, long friendId) {
         User user = getById(userId);
         validateUserId(friendId);
@@ -25,6 +33,7 @@ public class UserService {
         return userStorage.update(user);
     }
 
+    @RemovingEvent
     public User deleteFriend(long userId, long friendId) {
         User user = getById(userId);
         validateUserId(friendId);
@@ -65,6 +74,15 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
     }
 
+    /**
+     * @param id - идентификатор пользователя
+     * @return Возвращает список событий, совершенных пользователем с идентификатором id
+     * @author rs-popov
+     */
+    public List<Event> getFeed(long id) {
+        return eventStorage.getEventsByUserId(id);
+    }
+    
     /**
      * @param id - идентификатор юзера для которого готовятся рекомендации
      * @return - List<Film> - список рекомендованных фильмов основанный на коллаборативной фильтрации

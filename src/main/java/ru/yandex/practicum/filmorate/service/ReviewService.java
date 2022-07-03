@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.feedAOP.CreatingEvent;
+import ru.yandex.practicum.filmorate.feedAOP.RemovingEvent;
+import ru.yandex.practicum.filmorate.feedAOP.UpdatingEvent;
 import ru.yandex.practicum.filmorate.storage.filmstorage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.reviewstorage.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
@@ -29,20 +32,23 @@ public class ReviewService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
 
+    @CreatingEvent
     public Review create(Review review) {
         validateFilmId(review.getFilmId());
         validateUserId(review.getUserId());
         return reviewStorage.create(review);
     }
 
+    @UpdatingEvent
     public Review update(Review review) {
         validateFilmId(review.getFilmId());
         validateUserId(review.getUserId());
         return reviewStorage.update(review);
     }
 
-    public void delete(long id) {
-        reviewStorage.delete(id);
+    @RemovingEvent
+    public Review delete(long id) {
+        return reviewStorage.delete(id);
     }
 
     public Review findById(long id) {

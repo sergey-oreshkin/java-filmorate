@@ -30,6 +30,7 @@ jobs:
       - name: Install newman
         run: |
           npm install -g newman
+
       - name: Install helper script
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y wget &&
           wget --no-check-certificate -P /tmp/ https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh &&
@@ -49,6 +50,7 @@ jobs:
         run: |
           /tmp/wait-for-it.sh -t 60 localhost:8080
           echo "Application is up"
+
       - name: Run POSTMAN tests
         run: |
           newman run ./tests/postman/sprint.json -r cli
