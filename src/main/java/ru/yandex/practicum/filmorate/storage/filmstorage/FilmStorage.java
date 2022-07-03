@@ -22,4 +22,14 @@ public interface FilmStorage {
     List<Film> getCommonFilms(long userId, long friendId);
 
     void clear();
+
+    /**
+     * Метод для получения списка фильмов режиссера, отсортированные по лайкам(likes) или году релиза(year)
+     * @author Vladimir Arlhipenko
+     * @param id - идентификатор режиссера по которому готовится список фильмов
+     * @param sortBy - выбираемый тип сортировки (допустимы значения year(по году релиза), likes(по количеству лайков))
+     *               default значение "likes"
+     * @return List<Film> - список фильмов
+     */
+    List<Film> getDirectorFilms(long id, String sortBy);
 }
