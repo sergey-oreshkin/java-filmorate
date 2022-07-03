@@ -53,10 +53,46 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Поиск 'by' по режиссеру или названию фильма в мапе на основании введенных символов в 'query'
+     * Метод не реализован ввиду ненадобности
+     */
+    @Override
+    public List<Film> search(String query, String by) {
+        return null;
+    }
+
+    /**
+     * Удаление фильма из мапы
+     * Метод не реализован ввиду ненадобности
+     */
+    @Override
+    public boolean delete(Film film) {
+        return false;
+    }
+
+    @Override
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        return null;
+    }
+
+
     @Override
     public void clear() {
         nextId = 0;
         films.clear();
+    }
+
+    /**
+     * Заглушка для метода
+     *
+     * @author Vladimir Arlhipenko
+     */
+    @Override
+    public List<Film> getDirectorFilms(long id, String sortBy) { // TODO
+        return new ArrayList<>();
     }
 
     private long getNextId() {

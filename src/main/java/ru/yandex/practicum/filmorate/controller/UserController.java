@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -42,6 +43,17 @@ public class UserController {
         return userService.update(user);
     }
 
+    /**
+     * @param id объекта пользователя, которого удалют
+     * @author Grigory-PC
+     * <p>
+     * Удаляет пользователя из таблицы
+     */
+    @DeleteMapping("/{id}")
+    public void deleteUser(@Valid @PathVariable long id) {
+        userService.delete(id);
+    }
+
     @GetMapping("{id}")
     public User getById(@PathVariable long id) {
         return userService.getById(id);
@@ -77,4 +89,16 @@ public class UserController {
     public List<Event> getFeed(@PathVariable long id) {
         return userService.getFeed(id);
     }
+    
+    /**
+     * Эндпоинт для получения списка рекомендованных фильмов для конкретного юзера
+     * @author sergey-oreshkin
+     * @param id - идентификатор юзера для которого готовятся рекомендации
+     * @return List<Film> - список рекомендованных фильмов основанный на коллаборативной фильтрации
+     */
+    @GetMapping("{id}/recommendations")
+    public List<Film> getRecommendation(@PathVariable long id) {
+        return userService.getRecommendation(id);
+    }
 }
+

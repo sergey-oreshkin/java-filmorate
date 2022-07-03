@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -51,6 +52,7 @@ public class FilmDbStorage implements FilmStorage {
 
         film.setId(num.longValue());
         updateGenres(film);
+        updateDirectors(film);
         return film;
     }
 
@@ -76,6 +78,7 @@ public class FilmDbStorage implements FilmStorage {
         );
         updateGenres(film);
         updateLikes(film);
+        updateDirectors(film);
         return film;
     }
 
@@ -111,10 +114,117 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sql, this::mapRowToFilm, idList.toArray());
     }
 
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Поиск 'by' по режиссеру или названию фильма в таблице films на основании введенных символов в 'query'
+     */
+    @Override
+    public List<Film> search(String query, String by) {
+        String sqlDirector = "SELECT * " +
+                "FROM film " +
+                "WHERE director LIKE '%'?'%'";
+        String sqlTitle = "SELECT * " +
+                "FROM film " +
+                "WHERE name LIKE '%'?";
+        switch (by) {
+            case ("director,title"):
+                List<Film> directorTitleResultOfSearch = jdbcTemplate.query(sqlDirector, this::mapRowToFilm, query);
+                directorTitleResultOfSearch.addAll(jdbcTemplate.query(sqlTitle, this::mapRowToFilm, query));
+
+                return directorTitleResultOfSearch;
+            case ("director"):
+                return jdbcTemplate.query(sqlDirector, this::mapRowToFilm, query);
+            case ("title"):
+                return jdbcTemplate.query(sqlTitle, this::mapRowToFilm, query);
+            default:
+                break;
+        }
+        return null;
+    }
+
+    /**
+     * Удаление фильма из таблицы film
+     */
+    @Override
+    public boolean delete(Film film) {
+        String sql = "DELETE FROM film WHERE id = ?";
+        return jdbcTemplate.update(sql, film.getId()) > 0;
+    }
+
+    /**
+     * @author aitski (Leonid Kvan)
+     * Метод возвращает фильмы, которые лайкнули оба юзера,
+     * отсортированные по кол-ву лайков по убыванию
+     * За основу взят метод getTop автора sergey-oreshkin.
+     * Также добавлен SQL запрос, который сначала создает таблицу cte
+     * с добавлением вспомогательной колонки count,
+     * которая показывает кол-во повторений film_id для каждой строки.
+     * Далее выбираются только те фильмы, у которых юзеры ?, ?
+     * И сортируется по убыванию count
+     */
+    public List<Film> getCommonFilms(long userId, long friendId) {
+
+        String sql =
+                "with cte as " +
+                        "(select likes.*, counter.count " +
+                        "from likes " +
+                        "left join ( " +
+                        "select likes.film_id, count(likes.film_id) as count " +
+                        "from likes " +
+                        "group by likes.film_id) " +
+                        "counter on counter.film_id = likes.film_id) " +
+                        "select film_id from cte " +
+                        "where user_id in (?,?) " +
+                        "group by film_id, count " +
+                        "having count(*)=2 " +
+                        "order by count desc;";
+
+        List<Integer> idList = jdbcTemplate.query(sql, rs -> {
+            List<Integer> ids = new ArrayList<>();
+            while (rs.next()) {
+                ids.add(rs.getInt("film_id"));
+            }
+            return ids;
+        }, userId, friendId);
+        sql = "select * from film F " +
+                "join rating R on R.id=F.rating_id " +
+                "where F.id IN (" + String.join(",", Collections.nCopies(idList.size(), "?")) + ")";
+        return jdbcTemplate.query(sql, this::mapRowToFilm, idList.toArray());
+    }
+
     @Override
     public void clear() {
         String sql = "delete from film";
         jdbcTemplate.update(sql);
+    }
+
+    /**
+     * Метод для получения списка фильмов режиссера, отсортированные по лайкам(likes) или году релиза(year)
+     *
+     * @param directorId - идентификатор режиссера по которому готовится список фильмов
+     * @param sortBy     - выбираемый тип сортировки (допустимы значения year(по году релиза), likes(по количеству лайков))
+     *                   default значение "likes"
+     * @return List<Film> - список фильмов
+     * @author Vladimir Arlhipenko
+     */
+    @Override
+    public List<Film> getDirectorFilms(long directorId, String sortBy) {
+        String sql = "select * from film as F " +
+                "left join rating as R on R.id=F.rating_id " +
+                "join film_director as FD on FD.film_id=F.id " +
+                "left join likes as L on L.film_id=F.id " +
+                "where FD.director_id=? " +
+                "group by F.id " +
+                "order by count(L.user_id)";
+        if (sortBy.equals("year")) {
+            sql = "select * from film as F " +
+                    "left join rating R on R.id=F.rating_id " +
+                    "join film_director as FD on FD.film_id=F.id " +
+                    "where FD.director_id=? " +
+                    "order by extract(year from cast(release_date as date))";
+        }
+        return jdbcTemplate.query(sql, this::mapRowToFilm, directorId);
     }
 
     private void updateLikes(Film film) {
@@ -140,6 +250,24 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    /**
+     * Метод для обновления таблицы film_director (связывает фильм с режиссерами)
+     *
+     * @param film - фильм который необходимо обновить
+     * @author Vladimir Arlhipenko
+     */
+    private void updateDirectors(Film film) {
+        String deleteSql = "delete from film_director where film_id=?";
+        String insertSql = "insert into film_director (film_id, director_id) values(?,?)";
+
+        jdbcTemplate.update(deleteSql, film.getId());
+        if (film.getDirectors() != null) {
+            film.getDirectors().stream()
+                    .map(Director::getId)
+                    .forEach(id -> jdbcTemplate.update(insertSql, film.getId(), id));
+        }
+    }
+
     private Film mapRowToFilm(ResultSet rs, int rowNum) throws SQLException {
         if (rs.getRow() == 0) {
             throw new NotFoundException("Film not found");
@@ -152,10 +280,12 @@ public class FilmDbStorage implements FilmStorage {
                 rs.getDate("release_date").toLocalDate(),
                 rs.getInt("duration"),
                 null,
+                null,
                 null
         );
         film.setGenres(getGenresByFilmId(film.getId()));
         film.setLikes(getLikesByFilmId(film.getId()));
+        film.setDirectors(getDirectorsByFilmId(film.getId()));
         return film;
     }
 
@@ -171,10 +301,45 @@ public class FilmDbStorage implements FilmStorage {
         return genres.isEmpty() ? null : genres;
     }
 
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Поиск режиссеров по film id и добавление в коллекцию режиссеров
+     */
+    private Set<Director> getDirectorByFilmId(long id) {
+        String sql = "select director, id from director D " +
+                "left join film_director FD on FD.direcor_id = D.id " +
+                "where film_id = ?";
+        Set<Director> director = new HashSet<>(jdbcTemplate.query(
+                sql,
+                (rs, num) -> new Director(rs.getInt("id"), rs.getString("name")),
+                id)
+        );
+        return director.isEmpty() ? null : director;
+    }
+
     private Set<Long> getLikesByFilmId(long id) {
         String sql = "select user_id from likes where film_id=?";
         return new HashSet<>(
                 jdbcTemplate.query(sql, (rs, num) -> rs.getLong("user_id"), id)
         );
+    }
+
+    /**
+     * Метод для получения множества режиссеров, снявших фильм, по id фильма
+     *
+     * @param filmId - id фильма для которого необходимо получить множество режиссеров
+     * @author Vladimir Arlhipenko
+     */
+    private Set<Director> getDirectorsByFilmId(long filmId) {
+        String sql = "select id, name from directors D " +
+                "left join film_director FD on FD.director_id=D.id " +
+                "where FD.film_id=?";
+        Set<Director> directors = new HashSet<>(jdbcTemplate.query(
+                sql,
+                (rs, rowNum) -> new Director(rs.getLong("id"), rs.getString("name")),
+                filmId)
+        );
+        return directors.isEmpty() ? new HashSet<>() : directors;
     }
 }

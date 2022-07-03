@@ -53,6 +53,17 @@ public class FilmController {
         );
     }
 
+    /**
+     * @param id фильма, который удалют
+     * @author Grigory-PC
+     * <p>
+     * Удаляет фильм из таблицы
+     */
+    @DeleteMapping("/{id}")
+    public void deleteFilm(@Valid @PathVariable long id) {
+        filmService.delete(id);
+    }
+
     @GetMapping("{id}")
     public Film getById(@PathVariable long id) {
         return filmService.getById(id);
@@ -81,6 +92,44 @@ public class FilmController {
             @RequestParam(value = "genreId", required = false) Optional<Integer> genreId,
             @RequestParam(value = "year", required = false) Optional<Integer> year) {
         return filmService.getPopularFiltered(count, genreId, year);
+    }
+
+    @GetMapping("common")
+    public List<Film> getCommonFilms(
+            @RequestParam() long userId,
+            @RequestParam() long friendId
+            ) {
+        return filmService.getCommonFilms(userId,friendId);
+    }
+
+    /**
+     * @requestparam query строки поиска
+     * @requestparam by параметр поиска (director - поиск по режиссёру, title - поиск по названию)
+     * @author Grigory-PC
+     * <p>
+     * Ищет фильм по параметрам поиска
+     */
+    @GetMapping("search")
+    public List<Film> searchFilm(@RequestParam String query, @RequestParam String by) {
+        return filmService.searchFilm(query, by);
+    }
+    /**
+     * Эндпоинт для получения списка фильмов режиссера, отсортированные по лайкам или году релиза
+     * @author Vladimir Arlhipenko
+     * @param directorId - идентификатор режиссера по которому готовится список фильмов
+     * @param sortBy - выбираемый тип сортировки (допустимы значения year(по году релиза), likes(по количеству лайков))
+     *               default значение "likes"
+     * @return List<Film> - список фильмов
+     */
+    @GetMapping("director/{directorId}")
+    public List<Film> getDirectorFilms (@PathVariable long directorId,
+                                        @RequestParam(defaultValue = "likes") String sortBy) {
+        sortBy = sortBy.trim();
+        if (sortBy.equals("year") || sortBy.equals("likes")) {
+            return filmService.getDirectorFilms(directorId, sortBy);
+        }
+        throw new ValidationException("Sorting can't be " +
+                sortBy + ". The following values are supported (year,likes)");
     }
 
     private boolean isDateValid(Film film) {
