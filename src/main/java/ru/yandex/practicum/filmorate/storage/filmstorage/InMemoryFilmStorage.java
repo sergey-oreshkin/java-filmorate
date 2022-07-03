@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
@@ -57,6 +58,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void clear() {
         nextId = 0;
         films.clear();
+    }
+
+    /**
+     * Заглушка для метода
+     * @author Vladimir Arlhipenko
+     */
+    @Override
+    public List<Film> getDirectorFilms(long id, String sortBy) { // TODO
+        return new ArrayList<>();
     }
 
     private long getNextId() {

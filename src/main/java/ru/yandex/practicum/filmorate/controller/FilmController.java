@@ -72,6 +72,25 @@ public class FilmController {
         return filmService.getPopular(count);
     }
 
+    /**
+     * Эндпоинт для получения списка фильмов режиссера, отсортированные по лайкам или году релиза
+     * @author Vladimir Arlhipenko
+     * @param directorId - идентификатор режиссера по которому готовится список фильмов
+     * @param sortBy - выбираемый тип сортировки (допустимы значения year(по году релиза), likes(по количеству лайков))
+     *               default значение "likes"
+     * @return List<Film> - список фильмов
+     */
+    @GetMapping("director/{directorId}")
+    public List<Film> getDirectorFilms (@PathVariable long directorId,
+                                        @RequestParam(defaultValue = "likes") String sortBy) {
+        sortBy = sortBy.trim();
+        if (sortBy.equals("year") || sortBy.equals("likes")) {
+            return filmService.getDirectorFilms(directorId, sortBy);
+        }
+        throw new ValidationException("Sorting can't be " +
+                sortBy + ". The following values are supported (year,likes)");
+    }
+
     private boolean isDateValid(Film film) {
         return film.getReleaseDate().isAfter(EARLIEST_DATE);
     }
