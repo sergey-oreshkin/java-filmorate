@@ -57,6 +57,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     /**
      * @author Grigory-PC
      * <p>
+     * Поиск 'by' по режиссеру или названию фильма в мапе на основании введенных символов в 'query'
+     * Метод не реализован ввиду ненадобности
+     */
+    @Override
+    public List<Film> search(String query, String by) {
+        return null;
+    }
+    
+    /**
      * Удаление фильма из мапы
      * Метод не реализован ввиду ненадобности
      */

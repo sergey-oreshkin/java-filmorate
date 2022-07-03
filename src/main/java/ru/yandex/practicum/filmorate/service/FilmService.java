@@ -95,6 +95,14 @@ public class FilmService {
     }
 
     /**
+     * @author Grigory-PC
+     * <p>
+     * Поиск 'by' по режиссеру или названию фильма в таблице на основании введенных символов в 'query'
+     */
+    public List<Film> searchFilm(String query, String by) {
+        return filmStorage.search(query, by);
+    }
+    
      * Метод для получения списка фильмов режиссера, отсортированные по лайкам(likes) или году релиза(year)
      * так же в методе проверяется корректность переданного directorId
      * @author Vladimir Arlhipenko
