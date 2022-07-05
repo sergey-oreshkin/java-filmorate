@@ -10,10 +10,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -147,9 +144,12 @@ public class FilmDbStorage implements FilmStorage {
      * Удаление фильма из таблицы film
      */
     @Override
-    public boolean delete(Film film) {
+    public Film delete(long filmId) {
+        Film film = findById(filmId)
+                .orElseThrow(()->new NotFoundException("Film with id=" + filmId + " does not exist"));
         String sql = "DELETE FROM film WHERE id = ?";
-        return jdbcTemplate.update(sql, film.getId()) > 0;
+        jdbcTemplate.update(sql, filmId);
+        return film;
     }
 
     /**

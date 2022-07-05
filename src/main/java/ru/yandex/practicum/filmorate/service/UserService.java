@@ -133,7 +133,7 @@ public class UserService {
      * <p>
      * Удаление пользователя из таблицы
      */
-    public boolean delete(long id) {
-        return userStorage.delete(getById(id));
+    public User delete(long id) {
+        return userStorage.delete(id);
     }
 }

@@ -50,8 +50,9 @@ public class InMemoryUserStorage implements UserStorage {
      * Метод не реализован ввиду ненадобности
      */
     @Override
-    public boolean delete(User user) {
-        return false;
+    public User delete(long userId) {
+        return findById(userId)
+                .orElseThrow(()->new NotFoundException("User with id=" + userId + " does not exist"));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -60,8 +61,8 @@ public class FilmController {
      * Удаляет фильм из таблицы
      */
     @DeleteMapping("/{id}")
-    public void deleteFilm(@Valid @PathVariable long id) {
-        filmService.delete(id);
+    public Film deleteFilm(@Valid @PathVariable long id) {
+        return filmService.delete(id);
     }
 
     @GetMapping("{id}")

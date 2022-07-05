@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -37,8 +38,8 @@ public class ReviewController {
     }
 
     @DeleteMapping("{id}")
-    public void delete(@PathVariable long id) {
-        reviewService.delete(id);
+    public Review delete(@PathVariable long id) {
+        return reviewService.delete(id);
     }
 
     @GetMapping("{id}")
@@ -54,6 +55,7 @@ public class ReviewController {
     }
 
     @PutMapping("{id}/like/{userId}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void addLike(
             @PathVariable long id,
             @PathVariable long userId) {
@@ -61,6 +63,7 @@ public class ReviewController {
     }
 
     @PutMapping("{id}/dislike/{userId}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void addDislike(
             @PathVariable long id,
             @PathVariable long userId) {
@@ -68,6 +71,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("{id}/like/{userId}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteLike(
             @PathVariable long id,
             @PathVariable long userId) {
@@ -75,6 +79,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("{id}/dislike/{userId}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteDislike(
             @PathVariable long id,
             @PathVariable long userId) {
