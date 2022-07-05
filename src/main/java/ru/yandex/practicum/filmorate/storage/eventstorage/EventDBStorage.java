@@ -9,6 +9,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.OperationType;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,7 +44,7 @@ public class EventDBStorage implements EventStorage {
                 .addValue("user_id", event.getUserId())
                 .addValue("entity_id", event.getEntityId())
                 .addValue("eventType", event.getEventType())
-                .addValue("operation", event.getOperation())
+                .addValue("operation", event.getOperationType())
                 .addValue("event_time", Timestamp.valueOf(LocalDateTime.now()));
 
         Number num = jdbcInsert.executeAndReturnKey(parameters);
@@ -58,8 +60,8 @@ public class EventDBStorage implements EventStorage {
                 .eventId(rs.getLong("event_id"))
                 .userId(rs.getLong("user_id"))
                 .entityId(rs.getLong("entity_id"))
-                .eventType(rs.getString("eventType"))
-                .operation(rs.getString("operation"))
+                .eventType(EventType.valueOf(rs.getString("eventType")))
+                .operationType(OperationType.valueOf(rs.getString("operation")))
                 .timestamp(rs.getTimestamp("event_time").getTime())
                 .build();
     }

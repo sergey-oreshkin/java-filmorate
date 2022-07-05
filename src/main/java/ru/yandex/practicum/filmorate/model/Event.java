@@ -26,11 +26,11 @@ public class Event {
 
     @NonNull
     @Size(max = 10)
-    String eventType;
+    EventType eventType;
 
     @NonNull
     @Size(max = 10)
-    String operation;
+    OperationType operationType;
 
     @NonNull
     long timestamp;
