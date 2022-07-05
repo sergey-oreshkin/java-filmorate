@@ -51,7 +51,7 @@ public class Film {
     @Setter
     Set<Director> directors;
 
-    public int rate() {
-        return likes.size();
-    }
+    @NonFinal
+    @Setter
+    int rate;
 }

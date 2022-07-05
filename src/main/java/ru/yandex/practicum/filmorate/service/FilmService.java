@@ -29,6 +29,8 @@ public class FilmService {
     public Film setLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
         film.getLikes().add(userId);
+        int rate = film.getRate();
+        film.setRate(++rate);
         return filmStorage.update(film);
     }
 
@@ -36,6 +38,8 @@ public class FilmService {
     public Film deleteLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
         film.getLikes().remove(userId);
+        int rate = film.getRate();
+        film.setRate(--rate);
         return filmStorage.update(film);
     }
 
