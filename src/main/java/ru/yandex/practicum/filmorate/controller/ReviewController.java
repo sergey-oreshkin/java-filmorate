@@ -30,7 +30,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public Review create(@Valid @NotNull @RequestBody Review review) {
+    public Review create(@Valid @RequestBody Review review) {
         if (review.getId() != 0) {
             throw new ValidationException("Review id should be 0 for new review");
         }
@@ -38,7 +38,7 @@ public class ReviewController {
     }
 
     @PutMapping
-    public Review update(@Valid @NotNull @RequestBody Review review) {
+    public Review update(@Valid @RequestBody Review review) {
         return reviewService.update(review);
     }
 
