@@ -30,7 +30,7 @@ public class DirectorController {
 
     @GetMapping("/{id}")
     public Director getById(@PathVariable long id) {
-        return directorService.findById(id);
+        return directorService.getById(id);
     }
 
     @PostMapping
@@ -46,6 +46,6 @@ public class DirectorController {
     @DeleteMapping("/{id}")
     @ResponseStatus(value = HttpStatus.OK)
     public void delete(@PathVariable long id) {
-        directorService.deleteById(id);
+        directorService.delete(id);
     }
 }

@@ -86,6 +86,11 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
+    public List<Review> getAll() {
+        return null;
+    }
+
+    @Override
     public List<Review> getReviewsByIdLimited(long filmId, int count) {
 
         if (filmId == 0) {

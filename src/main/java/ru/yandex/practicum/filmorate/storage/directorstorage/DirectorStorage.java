@@ -6,19 +6,9 @@
 package ru.yandex.practicum.filmorate.storage.directorstorage;
 
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
-import java.util.List;
-import java.util.Optional;
 
-public interface DirectorStorage {
+public interface DirectorStorage extends Storage<Director> {
 
-    List<Director> getAll();
-
-    Director create(Director director);
-
-    Director update(Director director);
-
-    Optional<Director> findById(long id);
-
-    void deleteById(long id);
 }

@@ -147,9 +147,12 @@ public class FilmDbStorage implements FilmStorage {
      * Удаление фильма из таблицы film
      */
     @Override
-    public boolean delete(Film film) {
+    public Film delete(long filmId) {
+        Film film = findById(filmId)
+                .orElseThrow(()->new NotFoundException("Film with id=" + filmId + " does not exist"));
         String sql = "DELETE FROM film WHERE id = ?";
-        return jdbcTemplate.update(sql, film.getId()) > 0;
+        jdbcTemplate.update(sql, filmId);
+        return film;
     }
 
     /**

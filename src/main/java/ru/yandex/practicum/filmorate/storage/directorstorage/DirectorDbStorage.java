@@ -77,11 +77,14 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public void deleteById(long id) {
+    public Director delete(long directorId) {
+        Director director = findById(directorId)
+                .orElseThrow(()->new NotFoundException("Director with id=" + directorId + " does not exist"));
         String sqlFilmDirector = "delete from film_director where director_id=?";
         String sqlDirectors = "delete from directors where id=?";
-        jdbcTemplate.update(sqlFilmDirector, id);
-        jdbcTemplate.update(sqlDirectors, id);
+        jdbcTemplate.update(sqlFilmDirector, director.getId());
+        jdbcTemplate.update(sqlDirectors, director.getId());
+        return director;
     }
 
     private Director mapRowToDirector(ResultSet rs, int rowNum) throws SQLException {
