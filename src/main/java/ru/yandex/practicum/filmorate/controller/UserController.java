@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -26,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@Valid @NotNull @RequestBody User user) {
+    public User create(@Valid @RequestBody User user) {
         if (user.getId() != 0) {
             throw new ValidationException("User id should be 0 for new user");
         }
@@ -37,7 +36,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@Valid @NotNull @RequestBody User user) {
+    public User update(@Valid @RequestBody User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
