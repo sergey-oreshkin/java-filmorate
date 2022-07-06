@@ -1,13 +1,18 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 /**
@@ -16,6 +21,7 @@ import java.util.List;
  * и выдающий ответы по функции "Отзывы"
  */
 
+@Validated
 @RestController
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
@@ -49,7 +55,7 @@ public class ReviewController {
     @GetMapping()
     public List<Review> getReviewsByIdLimited(
             @RequestParam(defaultValue = "0") long filmId,
-            @RequestParam(defaultValue = "10") int count) {
+            @RequestParam(defaultValue = "10") @Positive int count) {
         return reviewService.getReviewsByIdLimited(filmId, count);
     }
 
@@ -79,5 +85,10 @@ public class ReviewController {
             @PathVariable long id,
             @PathVariable long userId) {
         reviewService.deleteDislike(id, userId);
+    }
+
+    @ExceptionHandler
+    ResponseEntity<?> requestParamsValidation(ConstraintViolationException e) {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }
