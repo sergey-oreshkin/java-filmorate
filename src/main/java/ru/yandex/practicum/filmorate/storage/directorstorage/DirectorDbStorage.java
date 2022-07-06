@@ -77,7 +77,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public Director deleteById(long directorId) {
+    public Director delete(long directorId) {
         Director director = findById(directorId)
                 .orElseThrow(()->new NotFoundException("Director with id=" + directorId + " does not exist"));
         String sqlFilmDirector = "delete from film_director where director_id=?";

@@ -49,7 +49,7 @@ public class ReviewController {
 
     @GetMapping("{id}")
     public Review findById(@PathVariable long id) {
-        return reviewService.findById(id);
+        return reviewService.getById(id);
     }
 
     @GetMapping()
