@@ -28,18 +28,22 @@ public class FilmService {
     @CreatingEvent
     public Film setLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
+        if (!film.getLikes().contains(userId)){
+            int rate = film.getRate();
+            film.setRate(++rate);
+        }
         film.getLikes().add(userId);
-        int rate = film.getRate();
-        film.setRate(++rate);
         return filmStorage.update(film);
     }
 
     @RemovingEvent
     public Film deleteLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
+        if (!film.getLikes().contains(userId)){
+            int rate = film.getRate();
+            film.setRate(--rate);
+        }
         film.getLikes().remove(userId);
-        int rate = film.getRate();
-        film.setRate(--rate);
         return filmStorage.update(film);
     }
 
