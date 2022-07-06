@@ -40,15 +40,15 @@ public class EventAspect {
             Object o = returningValue;
             if (o instanceof Review) {
                 Review review = (Review) o;
-                addEvent(review.getUserId(), review.getId(), EventType.REVIEW, OperationType.ADD);
+                addEvent(review.getUserId(), review.getId(), EventType.REVIEW, Operation.ADD);
             }
             if (o instanceof Film) {
                 Film film = (Film) o;
-                addEvent((long) joinPoint.getArgs()[1], film.getId(), EventType.LIKE, OperationType.ADD);
+                addEvent((long) joinPoint.getArgs()[1], film.getId(), EventType.LIKE, Operation.ADD);
             }
             if (o instanceof User) {
                 User user = (User) o;
-                addEvent(user.getId(), (long) joinPoint.getArgs()[1], EventType.FRIEND, OperationType.ADD);
+                addEvent(user.getId(), (long) joinPoint.getArgs()[1], EventType.FRIEND, Operation.ADD);
             }
         }
     }
@@ -63,15 +63,15 @@ public class EventAspect {
             Object o = returningValue;
             if (o instanceof Review) {
                 Review review = (Review) o;
-                addEvent(review.getUserId(), review.getId(), EventType.REVIEW, OperationType.REMOVE);
+                addEvent(review.getUserId(), review.getId(), EventType.REVIEW, Operation.REMOVE);
             }
             if (o instanceof Film) {
                 Film film = (Film) o;
-                addEvent((long) joinPoint.getArgs()[1], film.getId(), EventType.LIKE, OperationType.REMOVE);
+                addEvent((long) joinPoint.getArgs()[1], film.getId(), EventType.LIKE, Operation.REMOVE);
             }
             if (o instanceof User) {
                 User user = (User) o;
-                addEvent(user.getId(), (long) joinPoint.getArgs()[1], EventType.FRIEND, OperationType.REMOVE);
+                addEvent(user.getId(), (long) joinPoint.getArgs()[1], EventType.FRIEND, Operation.REMOVE);
             }
         }
     }
@@ -86,17 +86,17 @@ public class EventAspect {
         if (o instanceof Review) {
             Review review = (Review) o;
             addEvent(reviewStorage.findById(review.getId()).get().getUserId(),
-                    review.getId(), EventType.REVIEW, OperationType.UPDATE);
+                    review.getId(), EventType.REVIEW, Operation.UPDATE);
         }
         return joinPoint.proceed();
     }
 
-    private void addEvent(long userId, long entityId, EventType eventType, OperationType operationType) {
+    private void addEvent(long userId, long entityId, EventType eventType, Operation operation) {
         eventStorage.create(Event.builder()
                 .userId(userId)
                 .entityId(entityId)
                 .eventType(eventType)
-                .operationType(operationType)
+                .operation(operation)
                 .build());
     }
 }

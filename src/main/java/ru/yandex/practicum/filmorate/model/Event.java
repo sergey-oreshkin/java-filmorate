@@ -30,7 +30,7 @@ public class Event {
 
     @NonNull
     @Size(max = 10)
-    OperationType operationType;
+    Operation operation;
 
     @NonNull
     long timestamp;
