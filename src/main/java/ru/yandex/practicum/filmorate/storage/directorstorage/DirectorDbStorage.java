@@ -56,9 +56,8 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public Director update(Director director) {
-        if (findById(director.getId()).isEmpty()) {
-            throw new NotFoundException("Director with id=" + director.getId() + " not found");
-        }
+        findById(director.getId())
+                .orElseThrow(() -> new NotFoundException("Director with id=" + director.getId() + " not found"));
         String sql = "update directors set " +
                 "name=?" +
                 "where id=?";
