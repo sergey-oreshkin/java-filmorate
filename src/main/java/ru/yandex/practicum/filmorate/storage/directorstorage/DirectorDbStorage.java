@@ -15,6 +15,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -56,9 +57,8 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public Director update(Director director) {
-        if (findById(director.getId()).isEmpty()) {
-            throw new NotFoundException("Director with id=" + director.getId() + " not found");
-        }
+        findById(director.getId())
+                .orElseThrow(() -> new NotFoundException("Director with id=" + director.getId() + " not found"));
         String sql = "update directors set " +
                 "name=?" +
                 "where id=?";
@@ -77,11 +77,14 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public void deleteById(long id) {
+    public Director deleteById(long directorId) {
+        Director director = findById(directorId)
+                .orElseThrow(()->new NotFoundException("Director with id=" + directorId + " does not exist"));
         String sqlFilmDirector = "delete from film_director where director_id=?";
         String sqlDirectors = "delete from directors where id=?";
-        jdbcTemplate.update(sqlFilmDirector, id);
-        jdbcTemplate.update(sqlDirectors, id);
+        jdbcTemplate.update(sqlFilmDirector, director.getId());
+        jdbcTemplate.update(sqlDirectors, director.getId());
+        return director;
     }
 
     private Director mapRowToDirector(ResultSet rs, int rowNum) throws SQLException {

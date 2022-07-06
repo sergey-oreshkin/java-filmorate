@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.sql.RowSet;
@@ -53,9 +54,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-        if (findById(user.getId()).isEmpty()) {
-            throw new NotFoundException("User with id=" + user.getId() + " not exist");
-        }
+        findById(user.getId())
+                .orElseThrow(() -> new NotFoundException("User with id=" + user.getId() + " not exist"));
         String sql = "update users set " +
                 "email=?," +
                 "login=?," +
@@ -88,10 +88,12 @@ public class UserDbStorage implements UserStorage {
      * Удаление пользователя из таблицы users
      */
     @Override
-    public boolean delete(User user) {
+    public User delete(long userId) {
+        User user = findById(userId)
+                .orElseThrow(()->new NotFoundException("User with id=" + userId + " does not exist"));
         String sql = "DELETE FROM users WHERE id = ?";
-
-        return jdbcTemplate.update(sql, user.getId()) > 0;
+        jdbcTemplate.update(sql, userId);
+        return user;
     }
 
     @Override

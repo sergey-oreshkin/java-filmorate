@@ -36,7 +36,7 @@ public class DirectorService {
                 .orElseThrow(() -> new NotFoundException("Director with id=" + id + " not found"));
     }
 
-    public void deleteById(long id) {
-        directorStorage.deleteById(id);
+    public Director deleteById(long id) {
+        return directorStorage.deleteById(id);
     }
 }

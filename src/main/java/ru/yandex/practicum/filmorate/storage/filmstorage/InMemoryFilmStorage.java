@@ -70,8 +70,9 @@ public class InMemoryFilmStorage implements FilmStorage {
      * Метод не реализован ввиду ненадобности
      */
     @Override
-    public boolean delete(Film film) {
-        return false;
+    public Film delete(long filmId) {
+        return findById(filmId)
+                .orElseThrow(()->new NotFoundException("Film with id=" + filmId + " does not exist"));
     }
 
     @Override

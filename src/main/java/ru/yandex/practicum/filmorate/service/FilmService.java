@@ -130,13 +130,12 @@ public class FilmService {
      * <p>
      * Удаление фильма из таблицы
      */
-    public boolean delete(long id) {
-        return filmStorage.delete(getById(id));
+    public Film delete(long id) {
+        return filmStorage.delete(id);
     }
 
     private Film validateAndGetFilm(long filmId, long userId) {
-        userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
+        validateUserId(userId);
 
         return filmStorage.findById(filmId)
                 .orElseThrow(() -> new NotFoundException("Film with id=" + filmId + " not found"));
