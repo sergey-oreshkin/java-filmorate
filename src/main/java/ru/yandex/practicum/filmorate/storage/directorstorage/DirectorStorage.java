@@ -20,5 +20,5 @@ public interface DirectorStorage {
 
     Optional<Director> findById(long id);
 
-    void deleteById(long id);
+    Director deleteById(long directorId);
 }

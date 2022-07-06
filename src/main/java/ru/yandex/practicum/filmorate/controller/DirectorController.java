@@ -43,8 +43,7 @@ public class DirectorController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(value = HttpStatus.OK)
-    public void delete(@PathVariable long id) {
-        directorService.deleteById(id);
+    public Director delete(@PathVariable long id) {
+        return directorService.deleteById(id);
     }
 }

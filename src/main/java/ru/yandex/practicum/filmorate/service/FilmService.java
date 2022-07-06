@@ -129,8 +129,8 @@ public class FilmService {
      * <p>
      * Удаление фильма из таблицы
      */
-    public boolean delete(long id) {
-        return filmStorage.delete(getById(id));
+    public Film delete(long id) {
+        return filmStorage.delete(id);
     }
 
     private Film validateAndGetFilm(long filmId, long userId) {

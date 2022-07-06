@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Event;
@@ -49,8 +50,8 @@ public class UserController {
      * Удаляет пользователя из таблицы
      */
     @DeleteMapping("/{id}")
-    public void deleteUser(@Valid @PathVariable long id) {
-        userService.delete(id);
+    public User deleteUser(@Valid @PathVariable long id) {
+        return userService.delete(id);
     }
 
     @GetMapping("{id}")
