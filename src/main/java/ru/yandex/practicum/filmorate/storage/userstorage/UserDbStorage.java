@@ -11,10 +11,8 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.sql.RowSet;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -28,7 +26,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getAll() {
-        String sql = "select * from users";
+        String sql = "select * from users where isDelete=false";
         return jdbcTemplate.query(sql, this::mapRowToUser);
     }
 
@@ -44,7 +42,8 @@ public class UserDbStorage implements UserStorage {
                 .addValue("email", user.getEmail())
                 .addValue("login", user.getLogin())
                 .addValue("name", user.getName())
-                .addValue("birthday", user.getBirthday());
+                .addValue("birthday", user.getBirthday())
+                .addValue("isDelete", false);
 
         Number num = jdbcInsert.executeAndReturnKey(parameters);
 
@@ -75,7 +74,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Optional<User> findById(long id) {
-        String sql = "select * from users where id=?";
+        String sql = "select * from users where id=? and isDelete=false";
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(sql, this::mapRowToUser, id));
         } catch (EmptyResultDataAccessException e) {
@@ -91,8 +90,8 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User delete(long userId) {
         User user = findById(userId)
-                .orElseThrow(()->new NotFoundException("User with id=" + userId + " does not exist"));
-        String sql = "DELETE FROM users WHERE id = ?";
+                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " does not exist"));
+        String sql = "UPDATE users SET isDelete = true WHERE id = ?";
         jdbcTemplate.update(sql, userId);
         return user;
     }
