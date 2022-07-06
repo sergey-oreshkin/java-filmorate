@@ -119,9 +119,8 @@ public class FilmService {
      * @author Vladimir Arlhipenko
      */
     public List<Film> getDirectorFilms(long directorId, String sortBy) {
-        if (directorStorage.findById(directorId).isEmpty()) {
-            throw new NotFoundException("Director with id=" + directorId + " not found");
-        }
+        directorStorage.findById(directorId)
+                .orElseThrow(() -> new NotFoundException("Director with id=" + directorId + " not found"));
         return filmStorage.getDirectorFilms(directorId, sortBy);
     }
 
@@ -135,8 +134,7 @@ public class FilmService {
     }
 
     private Film validateAndGetFilm(long filmId, long userId) {
-        userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
+        validateUserId(userId);
 
         return filmStorage.findById(filmId)
                 .orElseThrow(() -> new NotFoundException("Film with id=" + filmId + " not found"));
