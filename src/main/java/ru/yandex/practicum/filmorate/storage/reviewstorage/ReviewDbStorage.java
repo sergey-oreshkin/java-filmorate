@@ -129,8 +129,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     private void validateId(long id) {
-        if (findById(id).isEmpty()) {
-            throw new NotFoundException("Review with id=" + id + " does not exist");
-        }
+        findById(id).orElseThrow(() -> new NotFoundException("Review with id=" + id + " does not exist"));
     }
 }

@@ -15,5 +15,4 @@ public class DirectorService extends AbstractService<Director> {
     public DirectorService(DirectorStorage directorStorage) {
         super(directorStorage);
     }
-
 }

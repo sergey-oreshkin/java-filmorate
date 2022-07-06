@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Event;
@@ -9,7 +10,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@Valid @NotNull @RequestBody User user) {
+    public User create(@Valid @RequestBody User user) {
         if (user.getId() != 0) {
             throw new ValidationException("User id should be 0 for new user");
         }
@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@Valid @NotNull @RequestBody User user) {
+    public User update(@Valid @RequestBody User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
@@ -50,8 +50,8 @@ public class UserController {
      * Удаляет пользователя из таблицы
      */
     @DeleteMapping("/{id}")
-    public void deleteUser(@Valid @PathVariable long id) {
-        userService.delete(id);
+    public User deleteUser(@Valid @PathVariable long id) {
+        return userService.delete(id);
     }
 
     @GetMapping("{id}")

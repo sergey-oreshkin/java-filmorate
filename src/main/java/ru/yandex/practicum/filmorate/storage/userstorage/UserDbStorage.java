@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.sql.RowSet;
@@ -53,9 +54,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-        if (findById(user.getId()).isEmpty()) {
-            throw new NotFoundException("User with id=" + user.getId() + " not exist");
-        }
+        findById(user.getId())
+                .orElseThrow(() -> new NotFoundException("User with id=" + user.getId() + " not exist"));
         String sql = "update users set " +
                 "email=?," +
                 "login=?," +
