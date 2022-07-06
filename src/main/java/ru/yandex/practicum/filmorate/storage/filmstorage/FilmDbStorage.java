@@ -58,9 +58,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        if (findById(film.getId()).isEmpty()) {
-            throw new NotFoundException("Film with id=" + film.getId() + " not found");
-        }
+        findById(film.getId())
+                .orElseThrow(() -> new NotFoundException("Film with id=" + film.getId() + " not found"));
         String sql = "update film set " +
                 "name=?," +
                 "description=?," +
