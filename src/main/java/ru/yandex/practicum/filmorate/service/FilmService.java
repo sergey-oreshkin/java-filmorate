@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.feedAOP.CreatingEvent;
 import ru.yandex.practicum.filmorate.feedAOP.RemovingEvent;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -34,10 +35,11 @@ public class FilmService extends AbstractService<Film> {
     @CreatingEvent
     public Film setLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
-        if (!film.getLikes().contains(userId)){
-            int rate = film.getRate();
-            film.setRate(++rate);
+        if (film.getLikes().contains(userId)) {
+            throw new ValidationException("The user already like this film");
         }
+        int rate = film.getRate();
+        film.setRate(++rate);
         film.getLikes().add(userId);
         return filmStorage.update(film);
     }
@@ -45,10 +47,11 @@ public class FilmService extends AbstractService<Film> {
     @RemovingEvent
     public Film deleteLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
-        if (!film.getLikes().contains(userId)){
-            int rate = film.getRate();
-            film.setRate(--rate);
+        if (!film.getLikes().contains(userId)) {
+            throw new ValidationException("Nothing to delete");
         }
+        int rate = film.getRate();
+        film.setRate(--rate);
         film.getLikes().remove(userId);
         return filmStorage.update(film);
     }

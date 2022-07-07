@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.List;
 

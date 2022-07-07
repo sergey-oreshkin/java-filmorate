@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -62,7 +61,7 @@ public class FilmController {
      * Удаляет фильм из таблицы
      */
     @DeleteMapping("/{id}")
-    public Film deleteFilm(@Valid @PathVariable long id) {
+    public Film deleteFilm(@PathVariable long id) {
         return filmService.delete(id);
     }
 
@@ -83,9 +82,10 @@ public class FilmController {
 
     /**
      * Эндпойнт /films/popular?count={limit}&genreId={genreId}&year={year} [GET]
-     * @param count - размер списка фильмов (если не указан, то count=10)
+     *
+     * @param count   - размер списка фильмов (если не указан, то count=10)
      * @param genreId - идентификатор жанра
-     * @param year - год выпуска
+     * @param year    - год выпуска
      * @return Возвращает список самых популярных фильмов указанного жанра за нужный год
      */
     @GetMapping("popular")
@@ -100,8 +100,8 @@ public class FilmController {
     public List<Film> getCommonFilms(
             @RequestParam() long userId,
             @RequestParam() long friendId
-            ) {
-        return filmService.getCommonFilms(userId,friendId);
+    ) {
+        return filmService.getCommonFilms(userId, friendId);
     }
 
     /**
@@ -115,18 +115,20 @@ public class FilmController {
     public List<Film> searchFilm(@RequestParam String query, @RequestParam String by) {
         return filmService.searchFilm(query, by);
     }
+
     /**
      * Эндпоинт для получения списка фильмов режиссера, отсортированные по лайкам или году релиза
-     * @author Vladimir Arlhipenko
+     *
      * @param directorId - идентификатор режиссера по которому готовится список фильмов
-     * @param sortBy - выбираемый тип сортировки (допустимы значения year(по году релиза), likes(по количеству лайков))
-     *               default значение "likes"
+     * @param sortBy     - выбираемый тип сортировки (допустимы значения year(по году релиза), likes(по количеству лайков))
+     *                   default значение "likes"
      * @return List<Film> - список фильмов
+     * @author Vladimir Arlhipenko
      */
     @GetMapping("director/{directorId}")
-    public List<Film> getDirectorFilms (@PathVariable long directorId,
-                                        @RequestParam(defaultValue = "likes") SortParam sortBy) {
-            return filmService.getDirectorFilms(directorId, sortBy);
+    public List<Film> getDirectorFilms(@PathVariable long directorId,
+                                       @RequestParam(defaultValue = "likes") SortParam sortBy) {
+        return filmService.getDirectorFilms(directorId, sortBy);
     }
 
     private boolean isDateValid(Film film) {

@@ -2,12 +2,12 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.feedAOP.CreatingEvent;
 import ru.yandex.practicum.filmorate.feedAOP.RemovingEvent;
-import ru.yandex.practicum.filmorate.storage.eventstorage.EventStorage;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.eventstorage.EventStorage;
 import ru.yandex.practicum.filmorate.storage.filmstorage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
 
@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class UserService extends AbstractService<User>{
+public class UserService extends AbstractService<User> {
 
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
@@ -70,7 +70,7 @@ public class UserService extends AbstractService<User>{
     public List<Event> getFeed(long id) {
         return eventStorage.getEventsByUserId(id);
     }
-    
+
     /**
      * @param id - идентификатор юзера для которого готовятся рекомендации
      * @return - List<Film> - список рекомендованных фильмов основанный на коллаборативной фильтрации

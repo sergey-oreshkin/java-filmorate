@@ -52,7 +52,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User delete(long userId) {
         return findById(userId)
-                .orElseThrow(()->new NotFoundException("User with id=" + userId + " does not exist"));
+                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " does not exist"));
     }
 
     @Override

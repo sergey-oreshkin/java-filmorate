@@ -15,7 +15,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -79,7 +78,7 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public Director delete(long directorId) {
         Director director = findById(directorId)
-                .orElseThrow(()->new NotFoundException("Director with id=" + directorId + " does not exist"));
+                .orElseThrow(() -> new NotFoundException("Director with id=" + directorId + " does not exist"));
         String sqlFilmDirector = "delete from film_director where director_id=?";
         String sqlDirectors = "delete from directors where id=?";
         jdbcTemplate.update(sqlFilmDirector, director.getId());
