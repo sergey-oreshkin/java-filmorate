@@ -10,10 +10,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -59,9 +56,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        if (findById(film.getId()).isEmpty()) {
-            throw new NotFoundException("Film with id=" + film.getId() + " not found");
-        }
+        findById(film.getId())
+                .orElseThrow(() -> new NotFoundException("Film with id=" + film.getId() + " not found"));
         String sql = "update film set " +
                 "name=?," +
                 "description=?," +
@@ -146,9 +142,12 @@ public class FilmDbStorage implements FilmStorage {
      * Удаление фильма из таблицы film
      */
     @Override
-    public boolean delete(Film film) {
+    public Film delete(long filmId) {
+        Film film = findById(filmId)
+                .orElseThrow(()->new NotFoundException("Film with id=" + filmId + " does not exist"));
         String sql = "DELETE FROM film WHERE id = ?";
-        return jdbcTemplate.update(sql, film.getId()) > 0;
+        jdbcTemplate.update(sql, filmId);
+        return film;
     }
 
     /**
@@ -208,18 +207,19 @@ public class FilmDbStorage implements FilmStorage {
      * @author Vladimir Arlhipenko
      */
     @Override
-    public List<Film> getDirectorFilms(long directorId, String sortBy) {
+    public List<Film> getDirectorFilms(long directorId, SortParam sortBy) {
         String sql = "select * from film as F " +
                 "left join rating as R on R.id=F.rating_id " +
                 "join film_director as FD on FD.film_id=F.id " +
                 "where FD.director_id=? " +
                 "order by rate desc";
-        if (sortBy.equals("year")) {
+
+        if (sortBy.equals(SortParam.year)) {
             sql = "select * from film as F " +
                     "left join rating R on R.id=F.rating_id " +
                     "join film_director as FD on FD.film_id=F.id " +
                     "where FD.director_id=? " +
-                    "order by extract(year from cast(release_date as date))";
+                    "order by extract(year from release_date)";
         }
         return jdbcTemplate.query(sql, this::mapRowToFilm, directorId);
     }

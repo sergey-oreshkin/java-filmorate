@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -25,36 +24,36 @@ import java.util.List;
  */
 
 @Service
-@RequiredArgsConstructor
-public class ReviewService {
+public class ReviewService extends AbstractService<Review> {
 
     private final ReviewStorage reviewStorage;
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
 
+    public ReviewService(ReviewStorage reviewStorage, UserStorage userStorage, FilmStorage filmStorage) {
+        super(reviewStorage);
+        this.reviewStorage = reviewStorage;
+        this.userStorage = userStorage;
+        this.filmStorage = filmStorage;
+    }
+
     @CreatingEvent
     public Review create(Review review) {
         validateFilmId(review.getFilmId());
         validateUserId(review.getUserId());
-        return reviewStorage.create(review);
+        return super.create(review);
     }
 
     @UpdatingEvent
     public Review update(Review review) {
         validateFilmId(review.getFilmId());
         validateUserId(review.getUserId());
-        return reviewStorage.update(review);
+        return super.update(review);
     }
 
     @RemovingEvent
     public Review delete(long id) {
-        return reviewStorage.delete(id);
-    }
-
-    public Review findById(long id) {
-        return reviewStorage.findById(id)
-                .orElseThrow(() -> new NotFoundException
-                        ("Review with id=" + id + " not found"));
+        return super.delete(id);
     }
 
     public List<Review> getReviewsByIdLimited(long filmId, int count) {

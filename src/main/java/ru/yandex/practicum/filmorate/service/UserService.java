@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Event;
@@ -9,7 +8,6 @@ import ru.yandex.practicum.filmorate.feedAOP.CreatingEvent;
 import ru.yandex.practicum.filmorate.feedAOP.RemovingEvent;
 import ru.yandex.practicum.filmorate.storage.eventstorage.EventStorage;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.filmstorage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
 
@@ -17,13 +15,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-public class UserService {
+public class UserService extends AbstractService<User>{
 
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
 
     private final EventStorage eventStorage;
+
+    public UserService(UserStorage userStorage, FilmStorage filmStorage, EventStorage eventStorage) {
+        super(userStorage);
+        this.userStorage = userStorage;
+        this.filmStorage = filmStorage;
+        this.eventStorage = eventStorage;
+    }
 
     @CreatingEvent
     public User addFriend(long userId, long friendId) {
@@ -57,22 +61,6 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public List<User> getAll() {
-        return userStorage.getAll();
-    }
-
-    public User create(User user) {
-        return userStorage.create(user);
-    }
-
-    public User update(User user) {
-        return userStorage.update(user);
-    }
-
-    public User getById(long id) {
-        return userStorage.findById(id)
-                .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
-    }
 
     /**
      * @param id - идентификатор пользователя
@@ -127,13 +115,5 @@ public class UserService {
         userStorage.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
     }
-    
-     /**
-     * @author Grigory-PC
-     * <p>
-     * Удаление пользователя из таблицы
-     */
-    public boolean delete(long id) {
-        return userStorage.delete(getById(id));
-    }
+
 }

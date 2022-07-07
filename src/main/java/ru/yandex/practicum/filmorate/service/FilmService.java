@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.feedAOP.CreatingEvent;
 import ru.yandex.practicum.filmorate.feedAOP.RemovingEvent;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.storage.directorstorage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.filmstorage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
@@ -16,14 +16,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-public class FilmService {
+public class FilmService extends AbstractService<Film> {
 
     private final FilmStorage filmStorage;
 
     private final UserStorage userStorage;
 
     private final DirectorStorage directorStorage;
+
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage, DirectorStorage directorStorage) {
+        super(filmStorage);
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+        this.directorStorage = directorStorage;
+    }
 
     @CreatingEvent
     public Film setLike(long filmId, long userId) {
@@ -90,23 +96,6 @@ public class FilmService {
 
     }
 
-    public List<Film> getAll() {
-        return filmStorage.getAll();
-    }
-
-    public Film create(Film film) {
-        return filmStorage.create(film);
-    }
-
-    public Film update(Film film) {
-        return filmStorage.update(film);
-    }
-
-    public Film getById(long id) {
-        return filmStorage.findById(id)
-                .orElseThrow(() -> new NotFoundException("Film with id=" + id + " not found"));
-    }
-
     /**
      * @author Grigory-PC
      * <p>
@@ -126,25 +115,14 @@ public class FilmService {
      * @return List<Film> - список фильмов
      * @author Vladimir Arlhipenko
      */
-    public List<Film> getDirectorFilms(long directorId, String sortBy) {
-        if (directorStorage.findById(directorId).isEmpty()) {
-            throw new NotFoundException("Director with id=" + directorId + " not found");
-        }
+    public List<Film> getDirectorFilms(long directorId, SortParam sortBy) {
+        directorStorage.findById(directorId)
+                .orElseThrow(() -> new NotFoundException("Director with id=" + directorId + " not found"));
         return filmStorage.getDirectorFilms(directorId, sortBy);
     }
 
-    /**
-     * @author Grigory-PC
-     * <p>
-     * Удаление фильма из таблицы
-     */
-    public boolean delete(long id) {
-        return filmStorage.delete(getById(id));
-    }
-
     private Film validateAndGetFilm(long filmId, long userId) {
-        userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
+        validateUserId(userId);
 
         return filmStorage.findById(filmId)
                 .orElseThrow(() -> new NotFoundException("Film with id=" + filmId + " not found"));

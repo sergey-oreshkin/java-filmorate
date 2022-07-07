@@ -86,6 +86,11 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
+    public List<Review> getAll() {
+        return null;
+    }
+
+    @Override
     public List<Review> getReviewsByIdLimited(long filmId, int count) {
 
         if (filmId == 0) {
@@ -124,8 +129,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     private void validateId(long id) {
-        if (findById(id).isEmpty()) {
-            throw new NotFoundException("Review with id=" + id + " does not exist");
-        }
+        findById(id).orElseThrow(() -> new NotFoundException("Review with id=" + id + " does not exist"));
     }
 }
