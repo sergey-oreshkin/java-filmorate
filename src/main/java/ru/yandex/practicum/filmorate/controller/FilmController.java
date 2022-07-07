@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -124,13 +125,8 @@ public class FilmController {
      */
     @GetMapping("director/{directorId}")
     public List<Film> getDirectorFilms (@PathVariable long directorId,
-                                        @RequestParam(defaultValue = "likes") String sortBy) {
-        sortBy = sortBy.trim();
-        if (sortBy.equals("year") || sortBy.equals("likes")) {
+                                        @RequestParam(defaultValue = "likes") SortParam sortBy) {
             return filmService.getDirectorFilms(directorId, sortBy);
-        }
-        throw new ValidationException("Sorting can't be " +
-                sortBy + ". The following values are supported (year,likes)");
     }
 
     private boolean isDateValid(Film film) {

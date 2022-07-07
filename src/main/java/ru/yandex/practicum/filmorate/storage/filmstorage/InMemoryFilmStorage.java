@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.filmstorage;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortParam;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -92,8 +93,8 @@ public class InMemoryFilmStorage implements FilmStorage {
      * @author Vladimir Arlhipenko
      */
     @Override
-    public List<Film> getDirectorFilms(long id, String sortBy) { // TODO
-        return new ArrayList<>();
+    public List<Film> getDirectorFilms(long id, SortParam sortBy) { // TODO
+        return null;
     }
 
     private long getNextId() {

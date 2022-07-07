@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.storage.filmstorage;
 
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.Storage;
+import ru.yandex.practicum.filmorate.model.SortParam;
+import ru.yandex.practicum.filmorate.storage.Storage
 
 import java.util.List;
 
@@ -24,5 +25,5 @@ public interface FilmStorage extends Storage<Film> {
      * @return List<Film> - список фильмов
      * @author Vladimir Arlhipenko
      */
-    List<Film> getDirectorFilms(long id, String sortBy);
+    List<Film> getDirectorFilms(long id, SortParam sortBy);
 }

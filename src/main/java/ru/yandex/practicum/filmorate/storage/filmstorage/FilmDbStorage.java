@@ -208,7 +208,7 @@ public class FilmDbStorage implements FilmStorage {
      * @author Vladimir Arlhipenko
      */
     @Override
-    public List<Film> getDirectorFilms(long directorId, String sortBy) {
+    public List<Film> getDirectorFilms(long directorId, SortParam sortBy) {
         String sql = "select * from film as F " +
                 "left join rating as R on R.id=F.rating_id " +
                 "join film_director as FD on FD.film_id=F.id " +
@@ -216,12 +216,12 @@ public class FilmDbStorage implements FilmStorage {
                 "where FD.director_id=? " +
                 "group by F.id " +
                 "order by count(L.user_id)";
-        if (sortBy.equals("year")) {
+        if (sortBy.equals(SortParam.year)) {
             sql = "select * from film as F " +
                     "left join rating R on R.id=F.rating_id " +
                     "join film_director as FD on FD.film_id=F.id " +
                     "where FD.director_id=? " +
-                    "order by extract(year from cast(release_date as date))";
+                    "order by extract(year from release_date)";
         }
         return jdbcTemplate.query(sql, this::mapRowToFilm, directorId);
     }

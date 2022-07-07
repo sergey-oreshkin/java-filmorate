@@ -2,10 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.feedAOP.CreatingEvent;
 import ru.yandex.practicum.filmorate.feedAOP.RemovingEvent;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.storage.directorstorage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.filmstorage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.userstorage.UserStorage;
@@ -106,7 +107,7 @@ public class FilmService extends AbstractService<Film> {
      * @return List<Film> - список фильмов
      * @author Vladimir Arlhipenko
      */
-    public List<Film> getDirectorFilms(long directorId, String sortBy) {
+    public List<Film> getDirectorFilms(long directorId, SortParam sortBy) {
         directorStorage.findById(directorId)
                 .orElseThrow(() -> new NotFoundException("Director with id=" + directorId + " not found"));
         return filmStorage.getDirectorFilms(directorId, sortBy);
