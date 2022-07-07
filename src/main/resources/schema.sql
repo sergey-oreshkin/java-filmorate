@@ -6,7 +6,9 @@ CREATE TABLE IF NOT EXISTS users
     email    VARCHAR(50),
     login    VARCHAR(50),
     name     VARCHAR(50),
-    birthday DATE
+    birthday DATE,
+    isDelete BOOL      DEFAULT false,
+    updated  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS genre
@@ -35,6 +37,8 @@ CREATE TABLE IF NOT EXISTS film
     release_date DATE,
     duration     INT,
     rating_id    INT,
+    isDelete     BOOL      DEFAULT false,
+    updated      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     rate INT,
     CONSTRAINT fk_rating
         FOREIGN KEY (rating_id) REFERENCES rating (id) ON DELETE CASCADE
@@ -96,6 +100,8 @@ CREATE TABLE IF NOT EXISTS reviews
     userId     BIGINT,
     filmId     BIGINT,
     useful     INTEGER,
+    isDelete   BOOL      DEFAULT false,
+    updated    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT reviews_fk_users
         FOREIGN KEY (userId) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT reviews_fk_films
@@ -104,12 +110,12 @@ CREATE TABLE IF NOT EXISTS reviews
 
 CREATE TABLE IF NOT EXISTS events
 (
-    event_id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id     BIGINT,
-    entity_id   BIGINT,
-    eventType   VARCHAR(10),
-    operation   VARCHAR(10),
-    event_time  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    event_id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id    BIGINT,
+    entity_id  BIGINT,
+    eventType  VARCHAR(10),
+    operation  VARCHAR(10),
+    event_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_events_users
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );

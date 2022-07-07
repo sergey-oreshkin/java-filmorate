@@ -26,7 +26,8 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getAll() {
         String sql = "select * from film F " +
-                "left join rating R on R.id=F.rating_id";
+                "left join rating R on R.id=F.rating_id " +
+                "where F.isDelete=false";
         return jdbcTemplate.query(sql, this::mapRowToFilm);
     }
 
@@ -44,6 +45,7 @@ public class FilmDbStorage implements FilmStorage {
                 .addValue("rating_id", film.getMpa().getId())
                 .addValue("release_date", film.getReleaseDate())
                 .addValue("duration", film.getDuration())
+                .addValue("isDelete", false);
                 .addValue("rate", 0);
 
         Number num = jdbcInsert.executeAndReturnKey(parameters);
@@ -83,7 +85,7 @@ public class FilmDbStorage implements FilmStorage {
     public Optional<Film> findById(long id) {
         String sql = "select * from film F " +
                 "left join rating R on R.id=F.rating_id " +
-                "where F.id=?";
+                "where F.id=? and F.isDelete=false";
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(sql, this::mapRowToFilm, id));
         } catch (EmptyResultDataAccessException e) {
@@ -93,7 +95,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getTop(int count) {
-        String sql = "select id from film " +
+        String sql = "select id from film where F.isDelete=false " +
                 "order by rate desc limit ?;";
 
         List<Integer> idList = jdbcTemplate.query(sql, rs -> {
@@ -118,10 +120,10 @@ public class FilmDbStorage implements FilmStorage {
     public List<Film> search(String query, String by) {
         String sqlDirector = "SELECT * " +
                 "FROM film " +
-                "WHERE director LIKE '%'?'%'";
+                "WHERE director LIKE '%'?'%' AND F.isDelete=false";
         String sqlTitle = "SELECT * " +
                 "FROM film " +
-                "WHERE name LIKE '%'?";
+                "WHERE name LIKE '%'?'%' AND F.isDelete=false";
         switch (by) {
             case ("director,title"):
                 List<Film> directorTitleResultOfSearch = jdbcTemplate.query(sqlDirector, this::mapRowToFilm, query);
@@ -144,8 +146,8 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film delete(long filmId) {
         Film film = findById(filmId)
-                .orElseThrow(()->new NotFoundException("Film with id=" + filmId + " does not exist"));
-        String sql = "DELETE FROM film WHERE id = ?";
+                .orElseThrow(() -> new NotFoundException("Film with id=" + filmId + " does not exist"));
+        String sql = "UPDATE film SET isDelete = true WHERE id = ?";
         jdbcTemplate.update(sql, filmId);
         return film;
     }
@@ -211,14 +213,14 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "select * from film as F " +
                 "left join rating as R on R.id=F.rating_id " +
                 "join film_director as FD on FD.film_id=F.id " +
-                "where FD.director_id=? " +
+                "where FD.director_id=? AND F.isDelete=false " +
                 "order by rate desc";
 
         if (sortBy.equals(SortParam.year)) {
             sql = "select * from film as F " +
                     "left join rating R on R.id=F.rating_id " +
                     "join film_director as FD on FD.film_id=F.id " +
-                    "where FD.director_id=? " +
+                    "where FD.director_id=? AND F.isDelete=false " +
                     "order by extract(year from release_date)";
         }
         return jdbcTemplate.query(sql, this::mapRowToFilm, directorId);

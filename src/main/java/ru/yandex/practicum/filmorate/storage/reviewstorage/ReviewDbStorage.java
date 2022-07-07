@@ -44,7 +44,8 @@ public class ReviewDbStorage implements ReviewStorage {
                 .addValue("isPositive", review.getIsPositive())
                 .addValue("userId", review.getUserId())
                 .addValue("filmId", review.getFilmId())
-                .addValue("useful", 0);
+                .addValue("useful", 0)
+                .addValue("isDelete", false);
 
         Number num = jdbcInsert.executeAndReturnKey(parameters);
         review.setId(num.longValue());
@@ -68,15 +69,15 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public Review delete(long id) {
         Review review = findById(id)
-                .orElseThrow(()->new NotFoundException("Review with id=" + id + " does not exist"));
-        String sql = "delete from reviews where id=?";
+                .orElseThrow(() -> new NotFoundException("Review with id=" + id + " does not exist"));
+        String sql = "UPDATE reviews SET isDelete = true WHERE id = ?";
         jdbcTemplate.update(sql, id);
         return review;
     }
 
     @Override
     public Optional<Review> findById(long id) {
-        String sql = "select * from reviews where id=?";
+        String sql = "select * from reviews where id=? and isDelete=false";
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject
                     (sql, this::mapRowToReview, id));
@@ -95,12 +96,14 @@ public class ReviewDbStorage implements ReviewStorage {
 
         if (filmId == 0) {
             String sql = "select * from reviews " +
-                    "order by (useful) desc limit ?;";
+                    "where isDelete=false " +
+                    "order by (useful) desc limit ?";
             return jdbcTemplate.query(sql, this::mapRowToReview, count);
         }
 
         String sql1 = "select * from reviews " +
-                "where filmId=? order by (useful) desc limit ?;";
+                "where filmId=? and isDelete=false " +
+                "order by (useful) desc limit ?";
         return jdbcTemplate.query(sql1, this::mapRowToReview, filmId, count);
     }
 
