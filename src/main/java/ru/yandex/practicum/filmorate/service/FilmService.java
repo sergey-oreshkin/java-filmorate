@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.feedAOP.CreatingEvent;
@@ -17,14 +16,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-public class FilmService {
+public class FilmService extends AbstractService<Film> {
 
     private final FilmStorage filmStorage;
 
     private final UserStorage userStorage;
 
     private final DirectorStorage directorStorage;
+
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage, DirectorStorage directorStorage) {
+        super(filmStorage);
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+        this.directorStorage = directorStorage;
+    }
 
     @CreatingEvent
     public Film setLike(long filmId, long userId) {
@@ -83,23 +88,6 @@ public class FilmService {
 
     }
 
-    public List<Film> getAll() {
-        return filmStorage.getAll();
-    }
-
-    public Film create(Film film) {
-        return filmStorage.create(film);
-    }
-
-    public Film update(Film film) {
-        return filmStorage.update(film);
-    }
-
-    public Film getById(long id) {
-        return filmStorage.findById(id)
-                .orElseThrow(() -> new NotFoundException("Film with id=" + id + " not found"));
-    }
-
     /**
      * @author Grigory-PC
      * <p>
@@ -123,15 +111,6 @@ public class FilmService {
         directorStorage.findById(directorId)
                 .orElseThrow(() -> new NotFoundException("Director with id=" + directorId + " not found"));
         return filmStorage.getDirectorFilms(directorId, sortBy);
-    }
-
-    /**
-     * @author Grigory-PC
-     * <p>
-     * Удаление фильма из таблицы
-     */
-    public Film delete(long id) {
-        return filmStorage.delete(id);
     }
 
     private Film validateAndGetFilm(long filmId, long userId) {
