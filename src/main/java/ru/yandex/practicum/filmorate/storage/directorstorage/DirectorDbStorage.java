@@ -57,9 +57,8 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public Director update(Director director) {
-        if (findById(director.getId()).isEmpty()) {
-            throw new NotFoundException("Director with id=" + director.getId() + " not found");
-        }
+        findById(director.getId())
+                .orElseThrow(() -> new NotFoundException("Director with id=" + director.getId() + " not found"));
         String sql = "update directors set " +
                 "name=?" +
                 "where id=?";
@@ -78,7 +77,7 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public Director deleteById(long directorId) {
+    public Director delete(long directorId) {
         Director director = findById(directorId)
                 .orElseThrow(()->new NotFoundException("Director with id=" + directorId + " does not exist"));
         String sqlFilmDirector = "delete from film_director where director_id=?";

@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS film
     rating_id    INT,
     isDelete     BOOL      DEFAULT false,
     updated      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    rate INT,
     CONSTRAINT fk_rating
         FOREIGN KEY (rating_id) REFERENCES rating (id) ON DELETE CASCADE
 );
