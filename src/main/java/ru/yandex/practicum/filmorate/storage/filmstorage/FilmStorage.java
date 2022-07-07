@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage.filmstorage;
 
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.SortParam;
-import ru.yandex.practicum.filmorate.storage.Storage
+import ru.yandex.practicum.filmorate.storage.Storage;
 
 import java.util.List;
 

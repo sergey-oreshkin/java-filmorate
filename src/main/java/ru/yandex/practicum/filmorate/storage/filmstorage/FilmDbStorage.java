@@ -45,7 +45,7 @@ public class FilmDbStorage implements FilmStorage {
                 .addValue("rating_id", film.getMpa().getId())
                 .addValue("release_date", film.getReleaseDate())
                 .addValue("duration", film.getDuration())
-                .addValue("isDelete", false);
+                .addValue("isDelete", false)
                 .addValue("rate", 0);
 
         Number num = jdbcInsert.executeAndReturnKey(parameters);
@@ -95,7 +95,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getTop(int count) {
-        String sql = "select id from film where F.isDelete=false " +
+        String sql = "select id from film where isDelete=false " +
                 "order by rate desc limit ?;";
 
         List<Integer> idList = jdbcTemplate.query(sql, rs -> {
