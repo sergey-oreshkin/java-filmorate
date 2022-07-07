@@ -69,7 +69,7 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public Review delete(long id) {
         Review review = findById(id)
-                .orElseThrow(()->new NotFoundException("Review with id=" + id + " does not exist"));
+                .orElseThrow(() -> new NotFoundException("Review with id=" + id + " does not exist"));
         String sql = "UPDATE reviews SET isDelete = true WHERE id = ?";
         jdbcTemplate.update(sql, id);
         return review;
@@ -91,12 +91,14 @@ public class ReviewDbStorage implements ReviewStorage {
 
         if (filmId == 0) {
             String sql = "select * from reviews " +
-                    "order by (useful) desc limit ?;";
+                    "where isDelete=false " +
+                    "order by (useful) desc limit ?";
             return jdbcTemplate.query(sql, this::mapRowToReview, count);
         }
 
         String sql1 = "select * from reviews " +
-                "where filmId=? order by (useful) desc limit ?;";
+                "where filmId=? and isDelete=false " +
+                "order by (useful) desc limit ?";
         return jdbcTemplate.query(sql1, this::mapRowToReview, filmId, count);
     }
 
