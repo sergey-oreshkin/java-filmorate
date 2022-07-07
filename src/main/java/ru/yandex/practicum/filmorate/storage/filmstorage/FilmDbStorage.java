@@ -43,7 +43,8 @@ public class FilmDbStorage implements FilmStorage {
                 .addValue("description", film.getDescription())
                 .addValue("rating_id", film.getMpa().getId())
                 .addValue("release_date", film.getReleaseDate())
-                .addValue("duration", film.getDuration());
+                .addValue("duration", film.getDuration())
+                .addValue("rate", 0);
 
         Number num = jdbcInsert.executeAndReturnKey(parameters);
 
@@ -92,11 +93,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getTop(int count) {
-        String sql = "select F.id  rate from film F " +
-                "left join likes L on F.id=L.film_id " +
-                "group by F.id " +
-                "order by count(L.film_id) desc " +
-                "limit ?";
+        String sql = "select id from film " +
+                "order by rate desc limit ?;";
+
         List<Integer> idList = jdbcTemplate.query(sql, rs -> {
             List<Integer> ids = new ArrayList<>();
             while (rs.next()) {
@@ -212,10 +211,9 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "select * from film as F " +
                 "left join rating as R on R.id=F.rating_id " +
                 "join film_director as FD on FD.film_id=F.id " +
-                "left join likes as L on L.film_id=F.id " +
                 "where FD.director_id=? " +
-                "group by F.id " +
-                "order by count(L.user_id)";
+                "order by rate desc";
+
         if (sortBy.equals(SortParam.year)) {
             sql = "select * from film as F " +
                     "left join rating R on R.id=F.rating_id " +
@@ -227,13 +225,15 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void updateLikes(Film film) {
-        String deleteSql = "delete from likes where film_id=?";
-        String insertSql = "insert into likes (film_id, user_id) values(?,?)";
+        String deleteSql = "delete from likes where film_id=?;";
+        String insertSql = "insert into likes (film_id, user_id) values(?,?);";
+        String updateRateSql = "update film set rate=? where id=?;";
 
         jdbcTemplate.update(deleteSql, film.getId());
 
         if (film.getLikes() != null) {
             film.getLikes().forEach(id -> jdbcTemplate.update(insertSql, film.getId(), id));
+            jdbcTemplate.update(updateRateSql, film.getRate(), film.getId());
         }
     }
 
@@ -280,7 +280,8 @@ public class FilmDbStorage implements FilmStorage {
                 rs.getInt("duration"),
                 null,
                 null,
-                null
+                null,
+                rs.getInt("rate")
         );
         film.setGenres(getGenresByFilmId(film.getId()));
         film.setLikes(getLikesByFilmId(film.getId()));

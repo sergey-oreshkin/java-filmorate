@@ -49,7 +49,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public List<Film> getTop(int count) {
         if (count < 0) count = 0;
         return films.values().stream()
-                .sorted(Comparator.comparing(Film::rate).reversed())
+                .sorted(Comparator.comparing(Film::getRate).reversed())
                 .limit(count)
                 .collect(Collectors.toList());
     }

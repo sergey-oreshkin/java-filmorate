@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS film
     release_date DATE,
     duration     INT,
     rating_id    INT,
+    rate INT,
     CONSTRAINT fk_rating
         FOREIGN KEY (rating_id) REFERENCES rating (id) ON DELETE CASCADE
 );

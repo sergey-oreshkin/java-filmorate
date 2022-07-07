@@ -34,6 +34,10 @@ public class FilmService extends AbstractService<Film> {
     @CreatingEvent
     public Film setLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
+        if (!film.getLikes().contains(userId)){
+            int rate = film.getRate();
+            film.setRate(++rate);
+        }
         film.getLikes().add(userId);
         return filmStorage.update(film);
     }
@@ -41,6 +45,10 @@ public class FilmService extends AbstractService<Film> {
     @RemovingEvent
     public Film deleteLike(long filmId, long userId) {
         Film film = validateAndGetFilm(filmId, userId);
+        if (!film.getLikes().contains(userId)){
+            int rate = film.getRate();
+            film.setRate(--rate);
+        }
         film.getLikes().remove(userId);
         return filmStorage.update(film);
     }
