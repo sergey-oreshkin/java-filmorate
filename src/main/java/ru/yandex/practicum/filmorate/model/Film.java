@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Value
@@ -43,7 +42,16 @@ public class Film {
     @Setter
     Set<Genre> genres;
 
-    public int rate() {
-        return likes.size();
-    }
+    /**
+     * Множество для хранения режиссеров фильма
+     *
+     * @author Vladimir Arlhipenko
+     */
+    @NonFinal
+    @Setter
+    Set<Director> directors;
+
+    @NonFinal
+    @Setter
+    int rate;
 }

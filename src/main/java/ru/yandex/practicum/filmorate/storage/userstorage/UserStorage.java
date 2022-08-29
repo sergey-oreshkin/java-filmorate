@@ -1,19 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.userstorage;
 
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.Storage;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
-public interface UserStorage {
-
-    List<User> getAll();
-
-    User create(User u);
-
-    User update(User u);
-
-    Optional<User> findById(long id);
+public interface UserStorage extends Storage<User> {
 
     void clear();
+
+    Map<Long, Map<Long, Integer>> getLikesMatrix();
 }

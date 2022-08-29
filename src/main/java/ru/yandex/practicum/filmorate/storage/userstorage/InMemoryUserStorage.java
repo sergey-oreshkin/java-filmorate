@@ -43,10 +43,27 @@ public class InMemoryUserStorage implements UserStorage {
         return Optional.empty();
     }
 
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Удаление пользователя из мапы
+     * Метод не реализован ввиду ненадобности
+     */
+    @Override
+    public User delete(long userId) {
+        return findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " does not exist"));
+    }
+
     @Override
     public void clear() {
         users.clear();
         nextId = 0;
+    }
+
+    @Override
+    public Map<Long, Map<Long, Integer>> getLikesMatrix() {
+        return null; // TODO throw MethodNotImplemented
     }
 
     private long getNextId() {

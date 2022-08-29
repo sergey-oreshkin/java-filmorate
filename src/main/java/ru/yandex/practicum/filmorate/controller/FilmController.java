@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/films")
@@ -52,6 +54,17 @@ public class FilmController {
         );
     }
 
+    /**
+     * @param id фильма, который удалют
+     * @author Grigory-PC
+     * <p>
+     * Удаляет фильм из таблицы
+     */
+    @DeleteMapping("/{id}")
+    public Film deleteFilm(@PathVariable long id) {
+        return filmService.delete(id);
+    }
+
     @GetMapping("{id}")
     public Film getById(@PathVariable long id) {
         return filmService.getById(id);
@@ -67,9 +80,55 @@ public class FilmController {
         return filmService.deleteLike(id, userId);
     }
 
+    /**
+     * Эндпойнт /films/popular?count={limit}&genreId={genreId}&year={year} [GET]
+     *
+     * @param count   - размер списка фильмов (если не указан, то count=10)
+     * @param genreId - идентификатор жанра
+     * @param year    - год выпуска
+     * @return Возвращает список самых популярных фильмов указанного жанра за нужный год
+     */
     @GetMapping("popular")
-    public List<Film> getPopular(@RequestParam(defaultValue = "10") int count) {
-        return filmService.getPopular(count);
+    public List<Film> getPopular(
+            @RequestParam(value = "count", defaultValue = "10", required = false) int count,
+            @RequestParam(value = "genreId", required = false) Optional<Integer> genreId,
+            @RequestParam(value = "year", required = false) Optional<Integer> year) {
+        return filmService.getPopularFiltered(count, genreId, year);
+    }
+
+    @GetMapping("common")
+    public List<Film> getCommonFilms(
+            @RequestParam() long userId,
+            @RequestParam() long friendId
+    ) {
+        return filmService.getCommonFilms(userId, friendId);
+    }
+
+    /**
+     * @requestparam query строки поиска
+     * @requestparam by параметр поиска (director - поиск по режиссёру, title - поиск по названию)
+     * @author Grigory-PC
+     * <p>
+     * Ищет фильм по параметрам поиска
+     */
+    @GetMapping("search")
+    public List<Film> searchFilm(@RequestParam String query, @RequestParam String by) {
+        return filmService.searchFilm(query, by);
+    }
+
+    /**
+     * Эндпоинт для получения списка фильмов режиссера, отсортированные по лайкам или году релиза
+     *
+     * @param directorId - идентификатор режиссера по которому готовится список фильмов
+     * @param sortBy     - выбираемый тип сортировки (допустимы значения year(по году релиза), likes(по количеству лайков))
+     *                   default значение "likes"
+     * @return List<Film> - список фильмов
+     * @author Vladimir Arlhipenko
+     */
+    @GetMapping("director/{directorId}")
+    public List<Film> getDirectorFilms(@PathVariable long directorId,
+                                       @RequestParam(defaultValue = "likes") SortParam sortBy) {
+        return filmService.getDirectorFilms(directorId, sortBy);
     }
 
     private boolean isDateValid(Film film) {

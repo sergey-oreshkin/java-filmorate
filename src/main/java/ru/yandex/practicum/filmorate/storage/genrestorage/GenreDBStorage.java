@@ -27,7 +27,7 @@ public class GenreDBStorage implements GenreStorage {
     }
 
     @Override
-    public Optional<Genre> findById(int id) {
+    public Optional<Genre> findById(long id) {
         String sql = "select * from genre where id=?";
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(sql, this::mapRowToGenre, id));
@@ -36,7 +36,22 @@ public class GenreDBStorage implements GenreStorage {
         }
     }
 
-    private Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException{
+    @Override
+    public Genre create(Genre data) {
+        return null;
+    }
+
+    @Override
+    public Genre update(Genre data) {
+        return null;
+    }
+
+    @Override
+    public Genre delete(long Id) {
+        return null;
+    }
+
+    private Genre mapRowToGenre(ResultSet rs, int rowNum) throws SQLException {
         if (rs.getRow() == 0) {
             throw new NotFoundException("Genre not found");
         }

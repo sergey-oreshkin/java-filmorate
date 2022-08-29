@@ -27,13 +27,28 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     @Override
-    public Optional<Mpa> findById(int id) {
+    public Optional<Mpa> findById(long id) {
         String sql = "select * from rating where id=?";
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(sql, this::mapRowToMpa, id));
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Mpa create(Mpa data) {
+        return null;
+    }
+
+    @Override
+    public Mpa update(Mpa data) {
+        return null;
+    }
+
+    @Override
+    public Mpa delete(long Id) {
+        return null;
     }
 
     private Mpa mapRowToMpa(ResultSet rs, int rowNum) throws SQLException {

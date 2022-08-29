@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -14,10 +15,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @Primary
@@ -28,7 +26,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getAll() {
-        String sql = "select * from users";
+        String sql = "select * from users where isDelete=false";
         return jdbcTemplate.query(sql, this::mapRowToUser);
     }
 
@@ -44,7 +42,8 @@ public class UserDbStorage implements UserStorage {
                 .addValue("email", user.getEmail())
                 .addValue("login", user.getLogin())
                 .addValue("name", user.getName())
-                .addValue("birthday", user.getBirthday());
+                .addValue("birthday", user.getBirthday())
+                .addValue("isDelete", false);
 
         Number num = jdbcInsert.executeAndReturnKey(parameters);
 
@@ -54,9 +53,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-        if (findById(user.getId()).isEmpty()) {
-            throw new NotFoundException("User with id=" + user.getId() + " not exist");
-        }
+        findById(user.getId())
+                .orElseThrow(() -> new NotFoundException("User with id=" + user.getId() + " not exist"));
         String sql = "update users set " +
                 "email=?," +
                 "login=?," +
@@ -75,7 +73,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Optional<User> findById(long id) {
-        String sql = "select * from users where id=?";
+        String sql = "select * from users where id=? and isDelete=false";
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(sql, this::mapRowToUser, id));
         } catch (EmptyResultDataAccessException e) {
@@ -83,10 +81,50 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    /**
+     * @author Grigory-PC
+     * <p>
+     * Удаление пользователя из таблицы users
+     */
+    @Override
+    public User delete(long userId) {
+        User user = findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " does not exist"));
+        String sql = "UPDATE users SET isDelete = true WHERE id = ?";
+        jdbcTemplate.update(sql, userId);
+        return user;
+    }
+
     @Override
     public void clear() {
         String sql = "delete from users";
         jdbcTemplate.update(sql);
+    }
+
+    /**
+     * @return Map<Long, Map < Long, Integer>> ключи первой мапы id юзеров,
+     * второй ключи - id фильмов, значения : 1 - есть лайк, 0 - нет лайка
+     * @author sergey-oreshkin
+     */
+    @Override
+    public Map<Long, Map<Long, Integer>> getLikesMatrix() {
+        String sqlFilms = "select distinct film_id from likes";
+        String sqlLikes = "select * from likes";
+        Map<Long, Map<Long, Integer>> matrix = new HashMap<>();
+        Map<Long, Integer> filmLikesTemplate = new HashMap<>();
+
+        List<Long> allFilmsId = jdbcTemplate.query(sqlFilms, (rs, i) -> rs.getLong("film_id"));
+        allFilmsId.forEach(id -> filmLikesTemplate.put(id, 0));
+
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlLikes);
+        while (rs.next()) {
+            long userId = rs.getLong("user_id");
+            if (!matrix.containsKey(userId)) {
+                matrix.put(userId, new HashMap<>(filmLikesTemplate));
+            }
+            matrix.get(userId).put(rs.getLong("film_id"), 1);
+        }
+        return matrix;
     }
 
     private void updateFriends(User user) {
